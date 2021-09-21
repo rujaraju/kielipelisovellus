@@ -6,11 +6,12 @@ Tällä hetkellä olevat ominaisuukset:
 - käyttäjä voi kirjautua sisään ja ulos sekä luoda uuden tunnuksen
 - pelaaja voi valita kieltä millä haluaa pelata, ja sen jälkeen kyseisen kielen pelejä
 - pelaaja voi pelata pelin ja kerää sillä pisteitä
+- pelisuunnittelija voi lisätä kielen
 - pelisuunnittelija voi lisätä uuden pelin
 
 [Löytyy täältä](https://ruja-kieli.herokuapp.com/)
 
-Sunnitteluja ominaisuuksia:
+Sunniteltuja ominaisuuksia:
 - pelaaja näkee myös pelin yhteydessä mainoksia eri kursseista
 - pelaaja voi klikata kursseja ja näkee silloin lisää kurssin tietoja sekä järjestäjän tietoja
 - pelaaja voi myös klikata järjestäjän tietoja ja nähdä kaikki tämän järjestäjän kursseja
