@@ -19,8 +19,12 @@ def newuser():
     if (session.get("username")):
         return redirect("/")
     return render_template("newuser.html")
+
+@app.route("/newlanguage")
+def newlanguage():
+    return render_template("newlanguage.html")
     
-@app.route("/login",methods=["POST"])
+@app.route("/login",methods=["POST"]) # add message if wrong credentials
 def login():
     username = request.form["username"]
     passwToCheck = request.form["passw"]
