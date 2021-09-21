@@ -16,7 +16,7 @@ db = SQLAlchemy(app)
 
 @app.route("/newuser")
 def newuser():
-    if (session.get("username")):
+    if (session.get("user_id")):
         return redirect("/")
     return render_template("newuser.html")
 
@@ -35,21 +35,21 @@ def newgame():
 def login():
     username = request.form["username"]
     passwToCheck = request.form["passw"]
-    sql = "SELECT passw, authority, points, firstname FROM users WHERE username=:username"
+    sql = "SELECT passw, authority, points, firstname, id FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username": username})
     result = result.fetchone()
     if (result):
         if (result[0] == passwToCheck):
-            session["username"] = username
             session["authority"] = result[1]
             session["points"] = result[2]
             session["firstname"] = result[3]
+            session["user_id"] = result[4]
             return redirect("/")    
     return render_template("index.html", message="Tarkista kirjautumistietosi.")
 
 @app.route("/logout")
 def logout():
-    del session["username"], session["authority"], session["points"], session["firstname"]
+    del session["user_id"], session["authority"], session["points"], session["firstname"]
     return redirect("/")
 
 @app.route("/")
@@ -61,7 +61,7 @@ def index():
 
 @app.route("/kieli/<langname>")
 def language(langname):
-    if not session.get("username"):
+    if not session.get("user_id"):
         return redirect("/")
     print(langname)
     langname = langname.capitalize()
@@ -80,7 +80,7 @@ def language(langname):
 
 @app.route("/peli/<int:id>")
 def game(id):
-    if not session.get("username"):
+    if not session.get("user_id"):
         return redirect("/")
     sql = "SELECT gamename FROM games where id=:id"
     result = db.session.execute(sql, {"id":id})
@@ -105,15 +105,15 @@ def playgame():
         if rightanswers[i][0] == answers[i]:
             points += 1
         i += 1
-    print(str(points))
-    sql = "SELECT points FROM users WHERE username=:username"
-    result = db.session.execute(sql, {"username":session["username"]})
+    #sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, game_id"
+    sql = "SELECT points FROM users WHERE id=:user_id"
+    result = db.session.execute(sql, {"user_id":session["user_id"]})
     userpoints = result.fetchone()[0]
     print(str(userpoints))
     userpoints += points
     print(str(userpoints))
-    sql = "UPDATE users SET points=:userpoints WHERE username=:username"
-    db.session.execute(sql, {"username":session["username"], "userpoints": userpoints})
+    sql = "UPDATE users SET points=:userpoints WHERE id=:user_id"
+    db.session.execute(sql, {"user_id":session["user_id"], "userpoints": userpoints})
     db.session.commit()
     session["playing"] = None
     session["points"] = userpoints
