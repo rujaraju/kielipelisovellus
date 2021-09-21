@@ -59,6 +59,25 @@ def index():
     langs = result.fetchall()
     return render_template("index.html", langs=langs)
 
+@app.route("/kieli/<langname>")
+def language(langname):
+    if not session.get("username"):
+        return redirect("/")
+    print(langname)
+    langname = langname.capitalize()
+    print(langname)
+    sql = "SELECT id FROM langs where langname=:langname"
+    result = db.session.execute(sql, {"langname":langname})
+    result = result.fetchone()
+    if (result):
+        lang_id = result[0]
+        print(str(lang_id))
+        sql = "SELECT id, gamename FROM games where lang_id=:lang_id"
+        result = db.session.execute(sql, {"lang_id":lang_id})
+        games = result.fetchall()
+        return render_template("games.html", games=games)
+    return redirect("/")
+
 @app.route("/createuser", methods=["POST"])
 def createuser():
     username = request.form["username"]
