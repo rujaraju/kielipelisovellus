@@ -44,6 +44,14 @@ def login():
             session["points"] = result[2]
             session["firstname"] = result[3]
             session["user_id"] = result[4]
+            #select SUM for pointstable here
+            sql = "SELECT SUM(points) FROM points WHERE user_id=:user_id"
+            result = db.session.execute(sql, {"user_id":session["user_id"]})
+            points = result.fetchone()[0]
+            if points:
+                session["points"] = points
+            else:
+                session["points"] = 0
             return redirect("/")    
     return render_template("index.html", message="Tarkista kirjautumistietosi.")
 
@@ -88,14 +96,14 @@ def game(id):
     sql = "SELECT id, info FROM sentences WHERE games_id=:id"
     result = db.session.execute(sql, {"id":id})
     sentences = result.fetchall()
-    session["playing"] = id
+    session["game_id"] = id
     return render_template("game.html", gamename=gamename, sentences=sentences)
 
 @app.route("/playgame", methods=["POST"])
 def playgame():
     answers = request.form.getlist("answer")
     sql = "SELECT rightanswer FROM sentences WHERE games_id=:id"
-    result = db.session.execute(sql, {"id":session["playing"]})
+    result = db.session.execute(sql, {"id":session["game_id"]})
     rightanswers = result.fetchall()
     print(rightanswers) 
     print(answers)
@@ -105,18 +113,11 @@ def playgame():
         if rightanswers[i][0] == answers[i]:
             points += 1
         i += 1
-    #sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, game_id"
-    sql = "SELECT points FROM users WHERE id=:user_id"
-    result = db.session.execute(sql, {"user_id":session["user_id"]})
-    userpoints = result.fetchone()[0]
-    print(str(userpoints))
-    userpoints += points
-    print(str(userpoints))
-    sql = "UPDATE users SET points=:userpoints WHERE id=:user_id"
-    db.session.execute(sql, {"user_id":session["user_id"], "userpoints": userpoints})
+    sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
+    db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
     db.session.commit()
-    session["playing"] = None
-    session["points"] = userpoints
+    session["points"] = session["points"] + points
+    del session["game_id"]
     return redirect("/")
 
 @app.route("/createuser", methods=["POST"])
