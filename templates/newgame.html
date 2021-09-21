@@ -46,7 +46,8 @@ Oikea vastaus 9:
 <p>Lause 10:
 <input type="text" name="sentence">
 Oikea vastaus 10:
-<input type="text" name="rightanswer"></p> 
+<input type="text" name="rightanswer"></p>
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
 <input type="submit" value="Tallenna">
 </form>
 <a href="/">Palaa pääsivulle tallentamatta</a>

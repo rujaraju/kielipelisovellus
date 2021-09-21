@@ -1,5 +1,6 @@
 <form action="/createlang" method="POST">
 <p>Kielen nimi:<br>
-<input type="text" name="langname"></p> 
+<input type="text" name="langname"></p>
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
 <input type="submit" value="Tallenna">
 </form>

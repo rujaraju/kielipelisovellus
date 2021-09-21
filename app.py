@@ -3,8 +3,9 @@
 from flask import Flask
 from flask import redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
-from os import getenv
+from os import getenv, abort
 import fixforheroku
+import secrets
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = fixforheroku.uri #getenv("DATABASE_URL")
@@ -22,10 +23,18 @@ def newuser():
 
 @app.route("/newlanguage")
 def newlanguage():
+    if not session.get("user_id"):
+        return redirect("/")
+    if session["authority"] == 0:
+        return redirect("/") #normal user can't create games, all others can
     return render_template("newlanguage.html")
 
 @app.route("/newgame")
 def newgame():
+    if not session.get("user_id"):
+        return redirect("/")
+    if session["authority"] == 0:
+        return redirect("/") #normal user can't create games, all others can
     sql = "SELECT id, langname FROM langs"
     result = db.session.execute(sql)
     langs = result.fetchall()
@@ -40,6 +49,7 @@ def login():
     result = result.fetchone()
     if (result):
         if (result[0] == passwToCheck):
+            session["csrf_token"] = secrets.token_hex(16)
             session["authority"] = result[1]
             session["points"] = result[2]
             session["firstname"] = result[3]
@@ -149,6 +159,8 @@ def createuser():
 
 @app.route("/createlang", methods=["POST"])
 def createlang():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
     langname = request.form["langname"]
     langname = langname.capitalize()
     sql = "SELECT * FROM langs WHERE langname=:langname"
@@ -161,10 +173,12 @@ def createlang():
     lang_id = result.fetchone()[0]
     print(lang_id)
     db.session.commit()
-    return redirect("/newlanguage")
+    return redirect("/")
 
 @app.route("/creategame", methods=["POST"])
 def creategame():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
     gamename = request.form["gamename"]
     lang_id = request.form["lang_id"]
     sql = "SELECT * FROM games WHERE gamename=:gamename"
