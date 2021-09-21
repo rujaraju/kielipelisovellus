@@ -70,3 +70,19 @@ def createuser():
     print(user_id)
     db.session.commit()
     return redirect("/newuser")
+
+@app.route("/createlang", methods=["POST"])
+def createlang():
+    langname = request.form["langname"]
+    langname = langname.capitalize()
+    sql = "SELECT * FROM langs WHERE langname=:langname"
+    result = db.session.execute(sql, {"langname":langname})
+    if result.fetchone():
+        print("Language exists")
+        return redirect("/newlanguage")
+    sql = "INSERT INTO langs (langname) VALUES (:langname) RETURNING id"
+    result = db.session.execute(sql, {"langname":langname})
+    lang_id = result.fetchone()[0]
+    print(lang_id)
+    db.session.commit()
+    return redirect("/newlanguage")
