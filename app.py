@@ -44,16 +44,15 @@ def newgame():
 def login():
     username = request.form["username"]
     passwToCheck = request.form["passw"]
-    sql = "SELECT passw, authority, points, firstname, id FROM users WHERE username=:username"
+    sql = "SELECT passw, authority, firstname, id FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username": username})
     result = result.fetchone()
     if (result):
         if (result[0] == passwToCheck):
             session["csrf_token"] = secrets.token_hex(16)
             session["authority"] = result[1]
-            session["points"] = result[2]
-            session["firstname"] = result[3]
-            session["user_id"] = result[4]
+            session["firstname"] = result[2]
+            session["user_id"] = result[3]
             #select SUM for pointstable here
             sql = "SELECT SUM(points) FROM points WHERE user_id=:user_id"
             result = db.session.execute(sql, {"user_id":session["user_id"]})
@@ -150,8 +149,8 @@ def createuser():
     if result.fetchone():
         print("User exists")
         return redirect("/newuser")
-    sql = "INSERT INTO users (username, firstname, lastname, passw, authority, points) VALUES (:username, :firstname, :lastname, :passw, :authority, :points) RETURNING id"
-    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": authority, "points":0})
+    sql = "INSERT INTO users (username, firstname, lastname, passw, authority) VALUES (:username, :firstname, :lastname, :passw, :authority) RETURNING id"
+    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": authority})
     user_id = result.fetchone()[0]
     print(user_id)
     db.session.commit()
