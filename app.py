@@ -51,3 +51,22 @@ def index():
     result = db.session.execute(sql)
     langs = result.fetchall()
     return render_template("index.html", langs=langs)
+
+@app.route("/createuser", methods=["POST"])
+def createuser():
+    username = request.form["username"]
+    firstname = request.form["firstname"]
+    lastname = request.form["lastname"]
+    passw = request.form["passw"]
+    authority = int(request.form["authority"])
+    sql = "SELECT * FROM users WHERE username=:username"
+    result = db.session.execute(sql, {"username":username})
+    if result.fetchone():
+        print("User exists")
+        return redirect("/newuser")
+    sql = "INSERT INTO users (username, firstname, lastname, passw, authority, points) VALUES (:username, :firstname, :lastname, :passw, :authority, :points) RETURNING id"
+    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": authority, "points":0})
+    user_id = result.fetchone()[0]
+    print(user_id)
+    db.session.commit()
+    return redirect("/newuser")
