@@ -86,20 +86,23 @@ def language(langname):
         return render_template("games.html", games=games)
     return redirect("/")
 
-@app.route("/peli/<int:id>")
-def game(id):
+@app.route("/peli/<int:game_id>")
+def game(game_id):
     if not session.get("user_id"):
         return redirect("/")
     sql = "SELECT gamename FROM games where id=:id"
-    result = db.session.execute(sql, {"id":id})
+    result = db.session.execute(sql, {"id":game_id})
     gamename = result.fetchone()[0]
     sql = "SELECT id, info FROM sentences WHERE games_id=:id"
-    result = db.session.execute(sql, {"id":id})
+    result = db.session.execute(sql, {"id":game_id})
     sentences = result.fetchall()
-    session["game_id"] = id
+    sql = "SELECT points FROM points WHERE user_id=:user_id AND game_id=:game_id"
+    result = db.session.execute(sql, {"user_id": session["user_id"], "game_id": game_id})
+    session["current_points"] = result.fetchone()[0]
+    session["game_id"] = game_id
     return render_template("game.html", gamename=gamename, sentences=sentences)
 
-@app.route("/playgame", methods=["POST"])
+@app.route("/playgame", methods=["POST"]) # to add here: page to show result from current game
 def playgame():
     answers = request.form.getlist("answer")
     sql = "SELECT rightanswer FROM sentences WHERE games_id=:id"
@@ -113,11 +116,16 @@ def playgame():
         if rightanswers[i][0] == answers[i]:
             points += 1
         i += 1
-    sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
-    db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
+    if session["current_points"]: #user has played this game before
+        if points > session["current_points"]: #only update if got more points this time around
+            sql = "UPDATE points SET points=:points WHERE game_id=:game_id AND user_id:user_id"
+            db.session.execute(sql, {"points": points, "game_id": session["game_id"], "user_id": session["user_id"]})
+    else:
+        sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
+        db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
     db.session.commit()
     session["points"] = session["points"] + points
-    del session["game_id"]
+    del session["game_id"], session["current_points"]
     return redirect("/")
 
 @app.route("/createuser", methods=["POST"])

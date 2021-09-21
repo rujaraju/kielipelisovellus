@@ -1,4 +1,7 @@
 <p>Tsemppiä, {{ session.firstname }}!</p>
+{% if session.current_points %}
+<p><i>Viimeksi kun pelasit tätä peliä ansaitsit {{session.current_points}} pistettä!</i></p>
+{% endif %}
 <form action="/playgame" method="POST">
 <h2>{{ gamename }}</h2>
 {% for sentence in sentences %}
