@@ -4,8 +4,7 @@ CREATE TABLE users (
     firstname TEXT,
     lastname TEXT,
     passw TEXT,
-    authority INTEGER,
-    points INTEGER
+    authority INTEGER
 );
 
 CREATE TABLE langs (
@@ -24,7 +23,6 @@ CREATE TABLE sentences (
     id SERIAL PRIMARY KEY,
     info TEXT,
     rightanswer TEXT,
-    created_at TIMESTAMP,
     games_id INTEGER REFERENCES games
 );
 
