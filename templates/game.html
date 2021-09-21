@@ -1,0 +1,10 @@
+<p>Tsemppiä, {{ session.firstname }}!</p>
+<form action="/playgame" method="POST">
+<h2>{{ gamename }}</h2>
+{% for sentence in sentences %}
+<p>{{ sentence.info }}
+    <input type="text" name="answer" placeholder="Käännä sana"></p>
+{% endfor %}
+<input type="submit" value="Tallenna vastaus">
+</form>
+<a href="/">Peruuta</a>

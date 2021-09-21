@@ -78,6 +78,47 @@ def language(langname):
         return render_template("games.html", games=games)
     return redirect("/")
 
+@app.route("/peli/<int:id>")
+def game(id):
+    if not session.get("username"):
+        return redirect("/")
+    sql = "SELECT gamename FROM games where id=:id"
+    result = db.session.execute(sql, {"id":id})
+    gamename = result.fetchone()[0]
+    sql = "SELECT id, info FROM sentences WHERE games_id=:id"
+    result = db.session.execute(sql, {"id":id})
+    sentences = result.fetchall()
+    session["playing"] = id
+    return render_template("game.html", gamename=gamename, sentences=sentences)
+
+@app.route("/playgame", methods=["POST"])
+def playgame():
+    answers = request.form.getlist("answer")
+    sql = "SELECT rightanswer FROM sentences WHERE games_id=:id"
+    result = db.session.execute(sql, {"id":session["playing"]})
+    rightanswers = result.fetchall()
+    print(rightanswers) 
+    print(answers)
+    i = 0
+    points = 0
+    while i < len(rightanswers):
+        if rightanswers[i][0] == answers[i]:
+            points += 1
+        i += 1
+    print(str(points))
+    sql = "SELECT points FROM users WHERE username=:username"
+    result = db.session.execute(sql, {"username":session["username"]})
+    userpoints = result.fetchone()[0]
+    print(str(userpoints))
+    userpoints += points
+    print(str(userpoints))
+    sql = "UPDATE users SET points=:userpoints WHERE username=:username"
+    db.session.execute(sql, {"username":session["username"], "userpoints": userpoints})
+    db.session.commit()
+    session["playing"] = None
+    session["points"] = userpoints
+    return redirect("/")
+
 @app.route("/createuser", methods=["POST"])
 def createuser():
     username = request.form["username"]
