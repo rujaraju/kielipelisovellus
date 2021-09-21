@@ -23,6 +23,13 @@ def newuser():
 @app.route("/newlanguage")
 def newlanguage():
     return render_template("newlanguage.html")
+
+@app.route("/newgame")
+def newgame():
+    sql = "SELECT id, langname FROM langs"
+    result = db.session.execute(sql)
+    langs = result.fetchall()
+    return render_template("newgame.html", langs=langs)
     
 @app.route("/login",methods=["POST"]) # add message if wrong credentials
 def login():
@@ -86,3 +93,26 @@ def createlang():
     print(lang_id)
     db.session.commit()
     return redirect("/newlanguage")
+
+@app.route("/creategame", methods=["POST"])
+def creategame():
+    gamename = request.form["gamename"]
+    lang_id = request.form["lang_id"]
+    sql = "SELECT * FROM games WHERE gamename=:gamename"
+    result = db.session.execute(sql, {"gamename":gamename})
+    if result.fetchone():
+        print("game exists")
+        return redirect("/newgame") # to add: errormessage
+    sql = "INSERT INTO games (gamename, lang_id) VALUES (:gamename, :lang_id) RETURNING id"
+    result = db.session.execute(sql, {"gamename":gamename, "lang_id":lang_id})
+    games_id = result.fetchone()[0]
+    print("games id " + str(games_id))
+    sentences = request.form.getlist("sentence")
+    rightanswers = request.form.getlist("rightanswer")
+    for i in range(len(sentences)):
+        if (len(sentences[i])) == 0:
+            break
+        sql = "INSERT INTO sentences (games_id, info, rightanswer, created_at) VALUES (:games_id, :info, :rightanswer, NOW())"
+        db.session.execute(sql, {"games_id": games_id, "info": sentences[i], "rightanswer": rightanswers[i]})
+    db.session.commit()
+    return redirect("/newgame")

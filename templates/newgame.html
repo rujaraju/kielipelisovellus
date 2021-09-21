@@ -1,0 +1,52 @@
+<form action="/creategame" method="POST">
+<p>Pelin nimi:<br>
+<input type="text" name="gamename"></p>
+<label for="lang">Valitse kieli:</label>
+  <select id="lang" name="lang_id">
+    {% for lang in langs %}
+    <option value="{{lang.id}}">{{lang.langname}}</option>
+    {% endfor %} 
+  </select>
+<p>Lause 1:
+<input type="text" name="sentence">
+Oikea vastaus 1:
+<input type="text" name="rightanswer"></p>
+<p>Lause 2:
+<input type="text" name="sentence">
+Oikea vastaus 2:
+<input type="text" name="rightanswer"></p>
+<p>Lause 3:
+<input type="text" name="sentence">
+Oikea vastaus 3:
+<input type="text" name="rightanswer"></p>
+<p>Lause 4:
+<input type="text" name="sentence">
+Oikea vastaus 4:
+<input type="text" name="rightanswer"></p>
+<p>Lause 5:
+<input type="text" name="sentence">
+Oikea vastaus 5:
+<input type="text" name="rightanswer"></p> 
+<p>Lause 6:
+<input type="text" name="sentence">
+Oikea vastaus 6:
+<input type="text" name="rightanswer"></p> 
+<p>Lause 7:
+<input type="text" name="sentence">
+Oikea vastaus 7:
+<input type="text" name="rightanswer"></p> 
+<p>Lause 8:
+<input type="text" name="sentence">
+Oikea vastaus 8:
+<input type="text" name="rightanswer"></p>
+<p>Lause 9:
+<input type="text" name="sentence">
+Oikea vastaus 9:
+<input type="text" name="rightanswer"></p>
+<p>Lause 10:
+<input type="text" name="sentence">
+Oikea vastaus 10:
+<input type="text" name="rightanswer"></p> 
+<input type="submit" value="Tallenna">
+</form>
+<a href="/">Palaa pääsivulle tallentamatta</a>
