@@ -1,0 +1,26 @@
+{% if session.username %}
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Sinulla on {{session.points}} pistettä.</p>
+<h3>Valitse kieli:</h3>
+{% for lang in langs %}
+<a href="/kieli/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
+{% endfor %}
+<hr>
+<a href="/logout">Kirjaudu ulos</a>
+{% if session.authority > 0 %}
+<a href="/newgame">Luo uusi peli</a>
+{% endif %}
+{% if session.authority == 10000 %}
+<a href="/admin">Näytä hallintanäkymä</a>
+{% endif %}
+
+
+{% else %}
+<form action="/login" method="POST">
+<p>Tunnus:<br>
+<input type="text" name="username"></p>
+<p>Salasana:<br>
+<input type="password" name="passw"></p>
+<input type="submit" value="Kirjaudu">
+<a href="/newuser">Rekisteröidy</a>
+{% endif %}
