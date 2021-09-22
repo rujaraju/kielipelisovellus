@@ -236,7 +236,7 @@ def creategame():
     db.session.commit()
     return redirect("/omatpelit")
 
-@app.route("/createschool", methods=["POST"]) #to be done!!!
+@app.route("/createschool", methods=["POST"])
 def createschool():
     schoolname = request.form["schoolname"]
     info = request.form["info"]
@@ -251,3 +251,26 @@ def createschool():
     db.session.commit()
     session["school"] = school_id
     return redirect("/")
+
+@app.route("/editschool", methods=["POST"])
+def saveeditschool():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    schoolname = request.form["schoolname"]
+    info = request.form["info"]
+    address = request.form["address"]
+    phone = request.form["phone"]
+    www = request.form["www"]
+    sql = "SELECT schoolname FROM schools WHERE id=:id"
+    result = db.session.execute(sql, {"id": session["school"]})
+    oldname = result.fetchone()[0]
+    if oldname != schoolname: # someone wants to change the name of the school
+        sql = "SELECT * FROM schools WHERE schoolname=:schoolname"
+        result = db.session.execute(sql, {"schoolname": schoolname})
+        if result.fetchone():
+            print("the school already exists")
+            return redirect("/kouluhallinta")
+    sql = "UPDATE schools SET schoolname=:schoolname, info=:info, address=:address, phone=:phone, www=:www WHERE id=:id"
+    db.session.execute(sql, {"schoolname": schoolname, "info": info, "address": address, "phone": phone, "www": www, "id": session["school"]})
+    db.session.commit()
+    return redirect("/kouluhallinta")

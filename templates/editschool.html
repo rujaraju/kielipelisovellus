@@ -19,6 +19,7 @@
 <textarea name="www" style="width:500px; height:40px;">
 {{school.www}}
 </textarea><br>
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
 <input type="submit" value="Tallenna">
 </form>
 <a href="/">Palaa pääsivulle</a>

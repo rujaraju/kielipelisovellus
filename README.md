@@ -9,7 +9,7 @@ Tällä hetkellä olevat ominaisuukset:
 - pelisuunnittelija voi lisätä kielen
 - pelisuunnittelija voi lisätä uuden pelin
 - pelisuunnittelija näkee listan omista peleistään (siinä näkee mm. montako kertaa on pelattu)
-- koulutustarjoaja voi lisätä tiedot omasta koulustaan
+- koulutustarjoaja voi lisätä ja muokata tiedot omasta koulustaan
 
 [Löytyy täältä](https://ruja-kieli.herokuapp.com/)
 
@@ -21,4 +21,4 @@ Sunniteltuja ominaisuuksia:
 - koulutustarjoaja voi nähdä listan omista kursseistaan
 - koulutustarjoaja voi lisätä uusia kursseja ja lisätä pelejä jotka hänen mielestä sopii yhteen tämän kurssin kanssa
 - koulutustarjoaja voi muokata omia kurssejaan
-- pääkäyttäjä voi poistaa pelaajia, pelisuunnittelijoita, pelejä, koulutustarjoajia ja niiden kouluja, kursseja sekä badgeja
+- pääkäyttäjä voi poistaa pelaajia, pelisuunnittelijoita, pelejä, koulutustarjoajia ja niiden kouluja ja kursseja
