@@ -39,7 +39,11 @@ def newgame():
     result = db.session.execute(sql)
     langs = result.fetchall()
     return render_template("newgame.html", langs=langs)
-    
+
+@app.route("/uusikoulu")
+def newschool():
+    return render_template("newschool.html")
+
 @app.route("/login",methods=["POST"]) # add message if wrong credentials
 def login():
     username = request.form["username"]
@@ -61,12 +65,17 @@ def login():
                 session["points"] = points
             else:
                 session["points"] = 0
+            sql = "SELECT school_id FROM schooladmins WHERE user_id=:user_id"
+            result = db.session.execute(sql, {"user_id": session["user_id"]})
+            result = result.fetchone()
+            if result:
+                session["school"] = result[0] #this app limits the numbers of schools for one schooladmin to 1
             return redirect("/")    
     return render_template("index.html", message="Tarkista kirjautumistietosi.")
 
 @app.route("/logout")
 def logout():
-    del session["user_id"], session["authority"], session["points"], session["firstname"]
+    del session["user_id"], session["authority"], session["points"], session["firstname"], session["school"]
     return redirect("/")
 
 @app.route("/")
@@ -198,3 +207,19 @@ def creategame():
         db.session.execute(sql, {"games_id": games_id, "info": sentences[i], "rightanswer": rightanswers[i]})
     db.session.commit()
     return redirect("/newgame")
+
+@app.route("/createschool", methods=["POST"]) #to be done!!!
+def createschool():
+    schoolname = request.form["schoolname"]
+    info = request.form["info"]
+    address = request.form["address"]
+    phone = request.form["phone"]
+    www = request.form["www"]
+    sql = "INSERT INTO schools (schoolname, info, address, phone, www, visible) VALUES (:schoolname, :info, :address, :phone, :www, :visible) RETURNING id"
+    result = db.session.execute(sql, {"schoolname":schoolname, "info": info, "address": address, "phone": phone, "www": www, "visible": True})
+    school_id = result.fetchone()[0]
+    sql = "INSERT INTO schooladmins (user_id, school_id) VALUES (:user_id, :school_id)"
+    db.session.execute(sql, {"user_id":session["user_id"], "school_id": school_id})
+    db.session.commit()
+    session["school"] = school_id
+    return redirect("/")

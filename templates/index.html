@@ -10,6 +10,13 @@
 {% if session.authority > 0 %}
 <a href="/newlanguage">Lisää kieli</a>
 <a href="/newgame">Luo uusi peli</a>
+{% if session.authority == 2 %}
+{% if session.school %}
+<a href="/kouluhallinta">Muokkaa koulusi tiedot</a>
+{% else %}
+<a href="/uusikoulu">Lisää koulu sinun tietoosi</a>
+{% endif %}
+{% endif %}
 {% endif %}
 {% if session.authority == 10000 %}
 <a href="/admin">Näytä hallintanäkymä</a>
