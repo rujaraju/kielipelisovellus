@@ -13,6 +13,11 @@ Tällä hetkellä mukana olevat ominaisuudet:
 
 [Löytyy täältä](https://ruja-kieli.herokuapp.com/)
 
+Voit käyttää esim. koehenkilöitä:
+Peruskäyttäjä: käyttäjätunnus "barabbas", salasana "barbiedoll".
+Pelisuunnittelija: käyttäjätunnus "Moby", salasana "porcelain".
+Koulutustarjoaja: käyttäjätunnus "petrikoivu", salasana "mahla".
+
 Sunniteltuja ominaisuuksia:
 - pelaaja näkee myös pelin yhteydessä mainoksia eri kursseista
 - pelaaja voi klikata kursseja ja näkee silloin lisää kurssin tietoja sekä järjestäjän tietoja
