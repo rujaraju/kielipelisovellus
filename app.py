@@ -44,6 +44,10 @@ def newgame():
 def newschool():
     return render_template("newschool.html")
 
+@app.route("/uusikurssi")
+def newcourse():
+    return render_template("newschool.html")
+
 @app.route("/login",methods=["POST"]) # add message if wrong credentials
 def login():
     username = request.form["username"]
@@ -131,6 +135,15 @@ def game(game_id):
         session["current_points"] = result[0]
     session["game_id"] = game_id
     return render_template("game.html", gamename=gamename, sentences=sentences)
+
+@app.route("/kouluhallinta")
+def editschool():
+    if not session.get("school"):
+        return redirect("/")
+    sql = "SELECT * FROM schools WHERE id=:school_id"
+    result = db.session.execute(sql, {"school_id": session["school"]})
+    school = result.fetchone()
+    return render_template("editschool.html", school=school)
 
 @app.route("/playgame", methods=["POST"]) # to add here: page to show result from current game
 def playgame():
@@ -221,7 +234,7 @@ def creategame():
         sql = "INSERT INTO sentences (games_id, info, rightanswer) VALUES (:games_id, :info, :rightanswer)"
         db.session.execute(sql, {"games_id": games_id, "info": sentences[i], "rightanswer": rightanswers[i]})
     db.session.commit()
-    return redirect("/newgame")
+    return redirect("/omatpelit")
 
 @app.route("/createschool", methods=["POST"]) #to be done!!!
 def createschool():

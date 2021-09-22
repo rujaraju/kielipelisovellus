@@ -8,6 +8,8 @@ Tällä hetkellä olevat ominaisuukset:
 - pelaaja voi pelata pelin ja kerää sillä pisteitä
 - pelisuunnittelija voi lisätä kielen
 - pelisuunnittelija voi lisätä uuden pelin
+- pelisuunnittelija näkee listan omista peleistään (siinä näkee mm. montako kertaa on pelattu)
+- koulutustarjoaja voi lisätä tiedot omasta koulustaan
 
 [Löytyy täältä](https://ruja-kieli.herokuapp.com/)
 
@@ -16,8 +18,6 @@ Sunniteltuja ominaisuuksia:
 - pelaaja voi klikata kursseja ja näkee silloin lisää kurssin tietoja sekä järjestäjän tietoja
 - pelaaja voi myös klikata järjestäjän tietoja ja nähdä kaikki tämän järjestäjän kursseja
 - pelaaja voi nähdä scoreboardin eli verrata omat pistemäärät muiden pelaajien pistemääriin
-- pelisuunnittelija näkee listan omista peleistään (siinä näkee mm. montako kertaa on pelattu)
-- koulutustarjoaja voi lisätä tiedot omasta koulustaan
 - koulutustarjoaja voi nähdä listan omista kursseistaan
 - koulutustarjoaja voi lisätä uusia kursseja ja lisätä pelejä jotka hänen mielestä sopii yhteen tämän kurssin kanssa
 - koulutustarjoaja voi muokata omia kurssejaan

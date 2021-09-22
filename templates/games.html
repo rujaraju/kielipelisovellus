@@ -1,8 +1,8 @@
 <p>Hei, {{ session.firstname }}</p>
-<a href="/">Takaisin pääsivulle.</a>
 <h3>Valitse peli:</h3>
 {% for game in games %}
 <a href="/peli/{{ game.id }}">{{ game.gamename}}</a> <br>
 {% endfor %}
 <hr>
+<a href="/">Palaa pääsivulle</a><br />
 <a href="/logout">Kirjaudu ulos</a>
