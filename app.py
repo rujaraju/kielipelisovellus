@@ -75,7 +75,9 @@ def login():
 
 @app.route("/logout")
 def logout():
-    del session["user_id"], session["authority"], session["points"], session["firstname"], session["school"]
+    del session["user_id"], session["authority"], session["points"], session["firstname"]
+    if session.get("school"):
+        del session["school"]
     return redirect("/")
 
 @app.route("/")
@@ -123,7 +125,10 @@ def game(game_id):
     sentences = result.fetchall()
     sql = "SELECT points FROM points WHERE user_id=:user_id AND game_id=:game_id"
     result = db.session.execute(sql, {"user_id": session["user_id"], "game_id": game_id})
-    session["current_points"] = result.fetchone()[0]
+    result = result.fetchone()
+    if result:
+        print(result)
+        session["current_points"] = result[0]
     session["game_id"] = game_id
     return render_template("game.html", gamename=gamename, sentences=sentences)
 
@@ -141,16 +146,19 @@ def playgame():
         if rightanswers[i][0] == answers[i]:
             points += 1
         i += 1
-    if session["current_points"]: #user has played this game before
+    if session.get("current_points"): #user has played this game before
         if points > session["current_points"]: #only update if got more points this time around
-            sql = "UPDATE points SET points=:points WHERE game_id=:game_id AND user_id:user_id"
+            sql = "UPDATE points SET points=:points WHERE game_id=:game_id AND user_id=:user_id"
             db.session.execute(sql, {"points": points, "game_id": session["game_id"], "user_id": session["user_id"]})
+            session["points"] = session["points"] - session["current_points"] + points
+            del session["current_points"]
     else:
         sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
         db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
+        session["points"] = session["points"] + points
     db.session.commit()
-    session["points"] = session["points"] + points
-    del session["game_id"], session["current_points"]
+
+    del session["game_id"]
     return redirect("/")
 
 @app.route("/createuser", methods=["POST"])

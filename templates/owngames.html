@@ -1,0 +1,18 @@
+<p>Tämä on sinun suunnittelemasi pelit, {{ session.firstname }}!</p>
+<table>
+    <tr><th>Nimi</th><th>Pelikertoja</th><th>Aktiivinen</th><th>Piilota</th></tr>
+{% for game in games %}
+<tr>
+    <td>{{ game.gamename }}</td>
+    <td>{{ game.playcount }}</td>
+    <td>{% if game.visible == True %}
+        Kyllä
+        {% else %}
+        Ei
+        {% endif %}
+    </td>
+    <td><a href={{'/deaktivoi/' +  game.id|string }}>Valitse</a></td>
+</tr>
+{% endfor %}
+</table>
+<a href="/">Palaa pääsivulle</a>
