@@ -6,22 +6,22 @@
 <a href="/kieli/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
 {% endfor %}
 <hr>
-<a href="/logout">Kirjaudu ulos</a>
 {% if session.authority > 0 %}
-<a href="/newlanguage">Lisää kieli</a>
-<a href="/newgame">Luo uusi peli</a>
+<a href="/uusikieli">Lisää kieli</a> >> 
+<a href="/uusipeli">Luo uusi peli</a> >> 
+<a href="/omatpelit">Katso omia pelejäsi</a> >> 
 {% if session.authority == 2 %}
 {% if session.school %}
-<a href="/kouluhallinta">Muokkaa koulusi tiedot</a>
+<a href="/kouluhallinta">Muokkaa koulusi tiedot</a> >> 
 {% else %}
-<a href="/uusikoulu">Lisää koulu sinun tietoosi</a>
+<a href="/uusikoulu">Lisää koulu sinun tietoosi</a> >> 
 {% endif %}
 {% endif %}
 {% endif %}
 {% if session.authority == 10000 %}
-<a href="/admin">Näytä hallintanäkymä</a>
+<a href="/admin">Näytä hallintanäkymä</a> >>
 {% endif %}
-
+<a href="/logout">Kirjaudu ulos</a>
 
 {% else %}
 <form action="/login" method="POST">

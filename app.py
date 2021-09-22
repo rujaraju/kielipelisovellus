@@ -21,7 +21,7 @@ def newuser():
         return redirect("/")
     return render_template("newuser.html")
 
-@app.route("/newlanguage")
+@app.route("/uusikieli")
 def newlanguage():
     if not session.get("user_id"):
         return redirect("/")
@@ -29,7 +29,7 @@ def newlanguage():
         return redirect("/") #normal user can't create games, all others can
     return render_template("newlanguage.html")
 
-@app.route("/newgame")
+@app.route("/uusipeli")
 def newgame():
     if not session.get("user_id"):
         return redirect("/")
@@ -84,6 +84,13 @@ def index():
     result = db.session.execute(sql)
     langs = result.fetchall()
     return render_template("index.html", langs=langs)
+
+@app.route("/omatpelit")
+def ownGames():
+    sql = "SELECT * FROM games WHERE creator_id=:user_id ORDER BY visible"
+    result = db.session.execute(sql, {"user_id": session["user_id"]})
+    games = result.fetchall()
+    return render_template("owngames.html", games=games)
 
 @app.route("/kieli/<langname>")
 def language(langname):
@@ -194,8 +201,8 @@ def creategame():
     if result.fetchone():
         print("game exists")
         return redirect("/newgame") # to add: errormessage
-    sql = "INSERT INTO games (gamename, lang_id) VALUES (:gamename, :lang_id) RETURNING id"
-    result = db.session.execute(sql, {"gamename":gamename, "lang_id":lang_id})
+    sql = "INSERT INTO games (gamename, lang_id, creator_id) VALUES (:gamename, :lang_id, :user_id) RETURNING id"
+    result = db.session.execute(sql, {"gamename":gamename, "lang_id":lang_id, "user_id": session["user_id"]})
     games_id = result.fetchone()[0]
     print("games id " + str(games_id))
     sentences = request.form.getlist("sentence")
@@ -203,7 +210,7 @@ def creategame():
     for i in range(len(sentences)):
         if (len(sentences[i])) == 0:
             break
-        sql = "INSERT INTO sentences (games_id, info, rightanswer, created_at) VALUES (:games_id, :info, :rightanswer, NOW())"
+        sql = "INSERT INTO sentences (games_id, info, rightanswer) VALUES (:games_id, :info, :rightanswer)"
         db.session.execute(sql, {"games_id": games_id, "info": sentences[i], "rightanswer": rightanswers[i]})
     db.session.commit()
     return redirect("/newgame")

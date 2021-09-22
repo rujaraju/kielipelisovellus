@@ -16,7 +16,9 @@ CREATE TABLE games (
     id SERIAL PRIMARY KEY,
     gamename TEXT, 
     lang_id INTEGER REFERENCES langs,
-    visible BOOLEAN
+    creator_id INTEGER REFERENCES users,
+    playcount INTEGER DEFAULT 0,
+    visible BOOLEAN DEFAULT True
 );
 
 CREATE TABLE sentences (
