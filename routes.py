@@ -1,9 +1,9 @@
 from app import app
 from flask import redirect, render_template, request, session
 from os import abort
-import secrets
 from os import getenv
 from db import db
+import users
 
 app.secret_key = getenv("SECRET_KEY")
 
@@ -48,36 +48,13 @@ def newschool():
 def login():
     username = request.form["username"]
     passwToCheck = request.form["passw"]
-    sql = "SELECT passw, authority, firstname, id FROM users WHERE username=:username"
-    result = db.session.execute(sql, {"username": username})
-    result = result.fetchone()
-    if (result):
-        if (result[0] == passwToCheck):
-            session["csrf_token"] = secrets.token_hex(16)
-            session["authority"] = result[1]
-            session["firstname"] = result[2]
-            session["user_id"] = result[3]
-            #select SUM for pointstable here
-            sql = "SELECT SUM(points) FROM points WHERE user_id=:user_id"
-            result = db.session.execute(sql, {"user_id":session["user_id"]})
-            points = result.fetchone()[0]
-            if points:
-                session["points"] = points
-            else:
-                session["points"] = 0
-            sql = "SELECT school_id FROM schooladmins WHERE user_id=:user_id"
-            result = db.session.execute(sql, {"user_id": session["user_id"]})
-            result = result.fetchone()
-            if result:
-                session["school"] = result[0] #this app limits the numbers of schools for one schooladmin to 1
-            return redirect("/")    
+    if(users.login(username, passwToCheck)):
+        return redirect("/")    
     return render_template("index.html", message="Tarkista kirjautumistietosi.")
 
 @app.route("/logout")
 def logout():
-    del session["user_id"], session["authority"], session["points"], session["firstname"]
-    if session.get("school"):
-        del session["school"]
+    user.logout()
     return redirect("/")
 
 @app.route("/")
