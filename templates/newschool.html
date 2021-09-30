@@ -3,7 +3,6 @@
 <input type="text" name="schoolname"></p>
 <p>Kuvaus:<br>
 <textarea name="info" style="width:500px; height:150px;">
-<!--The cat was playing in the garden.-->
 </textarea>
 <p>Osoite:<br>
 <textarea name="address" style="width:500px; height:150px;">
@@ -11,6 +10,7 @@
 <p>Asiakaspalvelinpuh.nro:<br>
 <input type="text" name="phone"></p>
 <p>Interverkko-sivu:<br>
-<input type="text" name="www"></p>   
+<input type="text" name="www"></p>  
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">  
 <input type="submit" value="Tallenna">
 </form>

@@ -1,0 +1,9 @@
+<form action="/createcourse" method="POST">
+<p>Kurssin nimi:<br>
+<input type="text" name="coursename"></p>
+<p>Kuvaus:<br>
+<textarea name="info" style="width:500px; height:150px;">
+</textarea><br>
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+<input type="submit" value="Tallenna">
+</form>

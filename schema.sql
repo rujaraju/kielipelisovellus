@@ -56,7 +56,7 @@ CREATE TABLE courses (
     coursename TEXT,
     info TEXT,
     school_id INTEGER REFERENCES schools,
-    visible BOOLEAN
+    visible BOOLEAN DEFAULT true
 );
 
 CREATE TABLE coursegames (
