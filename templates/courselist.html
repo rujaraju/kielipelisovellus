@@ -1,0 +1,20 @@
+{% if courses %}
+<p>Valitse minkä kurssin haluat muokata.</p>
+
+{% for course in courses %}
+<p>{{course.coursename}}<a href="/kurssihallinta/{{course.id}}">(muokkaa)</a></p>
+{% endfor %}
+
+{% else %}
+
+Sinulla ei ole tällä hetkellä voimassa olevia kursseja.
+
+{% endif %}
+<a href="/luokurssi">Luo uukurssi</a>
+<hr>
+<a href="/">Palaa pääsivulle</a>
+{% if session.school %}
+<a href="/kouluhallinta">Muokkaa koulusi tiedot</a> >> 
+{% else %}
+<a href="/uusikoulu">Lisää koulu sinun tietoosi</a> >> 
+{% endif %}

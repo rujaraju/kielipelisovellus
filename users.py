@@ -28,7 +28,7 @@ def login(username, passwToCheck):
         return False
     return False
 
-def logout()
+def logout():
     del session["user_id"], session["authority"], session["points"], session["firstname"]
     if session.get("school"):
         del session["school"]

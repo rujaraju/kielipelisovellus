@@ -1,3 +1,9 @@
+{{ ids }}
+{% if (1,) in ids %}
+"yes"
+{% else %}
+"no"
+{% endif %}
 {% if session.user_id %}
 <h2>Hei, {{ session.firstname }}</h2>
 <p>Sinulla on {{session.points}} pistettä.</p>
@@ -17,6 +23,7 @@
 <a href="/uusikoulu">Lisää koulu sinun tietoosi</a> >> 
 {% endif %}
 <a href="/luokurssi">Luo kurssi</a> >>
+<a href="/kurssivalinta">Muokkaa kursseja</a> >>
 {% endif %}
 {% endif %}
 {% if session.authority == 10000 %}

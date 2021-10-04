@@ -1,45 +1,72 @@
 <p>Olet kiinnittämässä kurssin "{{ coursename }}" peleihin.</p>
+{{ games }}<br>{{chosen}}
+
 {% if langs %}
 <p>Valitse kieli:</p>
 {% for lang in langs %}
 <a href="/pelivalinta/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
 {% endfor %}
 {% else %}
-{{chosen}}
-<p>Valitse peli:</p>
-<form action="/choosegame" method="POST">
-    <table>
-    {% for game in games %}
-    <tr>{{game.id in chosen}}
-    {% if game.id not in chosen %}
-    <td><label for="{{game.id}}"> {{game.gamename}}</label></td><td><input type="checkbox" id="{{game.id}}" name="game" value="{{game.id}}"></td>
-    {% endif %}
-    </tr>
-    {% endfor %} 
+
+  {% for game in games %}
+  {% if (game.id,) not in chosen %}
+  <form>
+    <table action="/choosegame" method="POST">
+      <tr>
+        <td>
+          {{game.gamename}}        
+        </td>
+        <td>
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+          <input type="hidden" name="game_id" value="{{ game.game_id }}">
+          <input type="submit" value="Valitse">
+        </td>
+      </tr>
     </table>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"><br>
-    <input type="submit" value="Tallenna">
+  </form>
+  <form>
+    <table action="/choosegame" method="POST">
+      <tr>
+        <td>
+          {{game.gamename}}        
+        </td>
+        <td>
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+          <input type="hidden" name="game_id" value="{{ game.game_id }}">
+          (Valittu)
+        </td>
+        <td>
+          <input type="submit" value="Poista">
+        </td>
+      </tr>
+    </table>
   </form>
 
-  {% if chosen %}
-  <p>Poista kurssi pelistä:</p>
-  <form action="/unchoosegame" method="POST">
-    <table>
-    {% for game in games %}
-    <tr>
-    {% if game.id in chosen %}
-    <td><label for="un{{game.id}}"> {{game.gamename}}</label></td><td><input type="checkbox" id="un{{game.id}}" name="game" value="{{game.id}}"></td>
-    {% endif %}
-    </tr>
-    {% endfor %} 
+  {% else %}
+  <form>
+    <table action="/choosegame" method="POST">
+      <tr>
+        <td>
+          {{game.gamename}}        
+        </td>
+        <td>
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+          <input type="hidden" name="game_id" value="{{ game.game_id }}">
+          (Valittu)
+        </td>
+        <td>
+          <input type="submit" value="Poista">
+        </td>
+      </tr>
     </table>
-    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> <br>
-    <input type="submit" value="Poista">
   </form>
   {% endif %}
+  {% endfor %} 
+  
 
 <a href="/kielivalinta">Palaa kielivalikkoon</a>
 {% endif %}
+
 <br>
 <hr>
 <a href="/">Palaa pääsivulle</a>

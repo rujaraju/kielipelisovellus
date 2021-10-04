@@ -67,7 +67,10 @@ def index():
     sql = "SELECT langname FROM langs ORDER BY langname"
     result = db.session.execute(sql)
     langs = result.fetchall()
-    return render_template("index.html", langs=langs)
+    sql = "SELECT id from langs"
+    result = db.session.execute(sql)
+    ids = result.fetchall()
+    return render_template("index.html", langs=langs, ids=ids)
 
 @app.route("/omatpelit")
 def ownGames():
@@ -292,9 +295,10 @@ def choosegame(langname):
     result = result.fetchone()
     if (result):
         lang_id = result[0]
-        sql = "SELECT games.id, games.gamename FROM games LEFT JOIN coursegames ON games.id=coursegames.game_id WHERE games.lang_id=:lang_id AND coursegames.game_id is null"
-        result = db.session.execute(sql, {"lang_id":lang_id, "course_id": session["course"]})
+        sql = "SELECT id, gamename FROM games WHERE lang_id=:lang_id;"
+        result = db.session.execute(sql, {"lang_id":lang_id})
         games = result.fetchall()
+        print(games)
         sql = "SELECT coursename FROM courses WHERE id=:course_id"
         result = db.session.execute(sql, {"course_id":session["course"]})
         coursename = result.fetchone()[0]
@@ -306,8 +310,8 @@ def choosegame(langname):
         return render_template("chooselang.html", games=games, coursename=coursename, chosen=chosen)
     return redirect("/kielivalinta")
 
-@app.route("/choosegame", methods=["POST"])
-def coursegame():
+@app.route("/choosegame", methods=["POST"])#redo to different forms for every course
+def delcoursegame():
     if session["csrf_token"] != request.form["csrf_token"]:
         abort(403)
     games = request.form.getlist("game")
@@ -317,3 +321,39 @@ def coursegame():
         result = db.session.execute(sql, {"game_id": game, "course_id": session["course"]})
         db.session.commit()
     return redirect("/pelivalinta/" + session["langname"])
+
+@app.route("/unchoosegame", methods=["POST"])
+def coursegame():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    games = request.form.getlist("game")
+    print(games, session["course"])
+    for game in games:
+        sql = "DELETE FROM coursegames WHERE game_id=:game_id AND course_id=:course_id"
+        result = db.session.execute(sql, {"game_id": game, "course_id": session["course"]})
+        db.session.commit()
+    return redirect("/pelivalinta/" + session["langname"])
+
+@app.route("/kurssivalinta")
+def choosecourse():
+    if not session.get("user_id"):
+        return redirect("/")
+    if session["authority"] != 2:
+        return redirect("/") #only schooladmins can create courses
+    sql = "SELECT * from courses WHERE school_id=:school_id AND visible=True"
+    result = db.session.execute(sql, {"school_id": session["school"]})
+    courses = result.fetchall()
+    return render_template("courselist.html", courses=courses)#something ain't right if this happens
+
+@app.route("/kurssihallinta/<int:id>")
+def editcourse(id):
+    if not session.get("user_id"):
+        return redirect("/")
+    if session["authority"] != 2:
+        return redirect("/") #only schooladmins can edit courses
+    sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
+    result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
+    course = result.fetchone()
+    if course:
+        return render_template("editcourse.html", course=course)
+    return redirect("/kurssivalinta")#someone tried something funny, didn't work out
