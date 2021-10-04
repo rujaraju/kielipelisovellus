@@ -1,0 +1,23 @@
+<p>Olet kiinnittämässä kurssin "{{ coursename }}" peleihin.</p>
+{% for game in games %}
+{% if (game.id,) not in chosen %}
+<form action="/choosegame" method="POST">
+  {{game.gamename}}
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+  <input type="hidden" name="game_id" value="{{ game.id }}">
+  <input type="submit" value="Valitse">
+</form  >  
+{% else %}
+<form action="/unchoosegame" method="POST">
+  {{game.gamename}}
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+  <input type="hidden" name="game_id" value="{{ game.id }}">
+  (Valittu)
+  <input type="submit" value="Poista">
+</form  >
+{% endif %}
+{% endfor %}
+<a href="/kielivalinta">Palaa kielivalintaan</a>
+
+<hr>
+<a href="/">Palaa pääsivulle</a>

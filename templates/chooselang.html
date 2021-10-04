@@ -1,72 +1,8 @@
 <p>Olet kiinnittämässä kurssin "{{ coursename }}" peleihin.</p>
-{{ games }}<br>{{chosen}}
 
-{% if langs %}
 <p>Valitse kieli:</p>
 {% for lang in langs %}
 <a href="/pelivalinta/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
 {% endfor %}
-{% else %}
-
-  {% for game in games %}
-  {% if (game.id,) not in chosen %}
-  <form>
-    <table action="/choosegame" method="POST">
-      <tr>
-        <td>
-          {{game.gamename}}        
-        </td>
-        <td>
-          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-          <input type="hidden" name="game_id" value="{{ game.game_id }}">
-          <input type="submit" value="Valitse">
-        </td>
-      </tr>
-    </table>
-  </form>
-  <form>
-    <table action="/choosegame" method="POST">
-      <tr>
-        <td>
-          {{game.gamename}}        
-        </td>
-        <td>
-          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-          <input type="hidden" name="game_id" value="{{ game.game_id }}">
-          (Valittu)
-        </td>
-        <td>
-          <input type="submit" value="Poista">
-        </td>
-      </tr>
-    </table>
-  </form>
-
-  {% else %}
-  <form>
-    <table action="/choosegame" method="POST">
-      <tr>
-        <td>
-          {{game.gamename}}        
-        </td>
-        <td>
-          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-          <input type="hidden" name="game_id" value="{{ game.game_id }}">
-          (Valittu)
-        </td>
-        <td>
-          <input type="submit" value="Poista">
-        </td>
-      </tr>
-    </table>
-  </form>
-  {% endif %}
-  {% endfor %} 
-  
-
-<a href="/kielivalinta">Palaa kielivalikkoon</a>
-{% endif %}
-
-<br>
 <hr>
 <a href="/">Palaa pääsivulle</a>

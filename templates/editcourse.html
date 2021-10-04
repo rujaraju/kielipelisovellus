@@ -1,0 +1,24 @@
+<form action="/editcourse" method="POST">
+    <p>Kurssin nimi:<br>
+    <textarea name="coursename" style="width:500px; height:40px;">
+{{ course.coursename }}
+    </textarea>
+    <p>Kuvaus:<br>
+    <textarea name="info" style="width:500px; height:150px;">
+{{course.info}}
+    </textarea><br>
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+    <input type="submit" value="Tallenna">
+</form>
+{% if games %}
+Tämä kurssi on kiinnitetty peleihin:
+{% for game in games %}
+<form action="/unchoosegame" method="POST">
+    {{game.gamename}}
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+    <input type="hidden" name="game_id" value="{{ game.id }}">
+    <input type="submit" value="Poista peli">
+  </form  >
+{% endfor %}
+{% endif %}
+<a href="/kielivalinta">Kiinnitä kurssi peleihin</a>

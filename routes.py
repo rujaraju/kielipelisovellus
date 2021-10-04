@@ -269,6 +269,17 @@ def createcourse():
     session["course"] = course_id
     return redirect("/kielivalinta")
 
+@app.route("/editcourse", methods=["POST"])
+def editcourse():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    coursename = request.form["coursename"]
+    info = request.form["info"]
+    sql = "UPDATE courses SET coursename=:coursename, info=:info WHERE id=:id"
+    db.session.execute(sql, {"coursename":coursename, "info": info, "id": session["course"]})
+    db.session.commit()
+    return redirect("/kurssihallinta/" + str(session["course"]))
+
 @app.route("/kielivalinta")
 def chooselang():
     if not session.get("user_id"):
@@ -307,32 +318,32 @@ def choosegame(langname):
         chosen = result.fetchall()
         print(chosen)
         session["langname"] = langname
-        return render_template("chooselang.html", games=games, coursename=coursename, chosen=chosen)
+        return render_template("choosegame.html", games=games, coursename=coursename, chosen=chosen)
     return redirect("/kielivalinta")
 
-@app.route("/choosegame", methods=["POST"])#redo to different forms for every course
-def delcoursegame():
-    if session["csrf_token"] != request.form["csrf_token"]:
-        abort(403)
-    games = request.form.getlist("game")
-    print(games, session["course"])
-    for game in games:
-        sql = "INSERT INTO coursegames (game_id, course_id) VALUES (:game_id, :course_id)"
-        result = db.session.execute(sql, {"game_id": game, "course_id": session["course"]})
-        db.session.commit()
-    return redirect("/pelivalinta/" + session["langname"])
-
-@app.route("/unchoosegame", methods=["POST"])
+@app.route("/choosegame", methods=["POST"])
 def coursegame():
     if session["csrf_token"] != request.form["csrf_token"]:
         abort(403)
-    games = request.form.getlist("game")
-    print(games, session["course"])
-    for game in games:
-        sql = "DELETE FROM coursegames WHERE game_id=:game_id AND course_id=:course_id"
-        result = db.session.execute(sql, {"game_id": game, "course_id": session["course"]})
-        db.session.commit()
+    game_id = request.form["game_id"]
+    sql = "INSERT INTO coursegames (game_id, course_id) VALUES (:game_id, :course_id)"
+    db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
+    db.session.commit()
     return redirect("/pelivalinta/" + session["langname"])
+
+@app.route("/unchoosegame", methods=["POST"])
+def delcoursegame():
+    print("doing anything")
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
+    game_id = request.form["game_id"]
+    print(game_id, session["course"])
+    sql = "DELETE FROM coursegames WHERE game_id=:game_id AND course_id=:course_id"
+    db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
+    db.session.commit()
+    if session.get("langname"):#game was unchosen from gamemenu
+        return redirect("/pelivalinta/" + session["langname"])
+    return redirect("/kurssihallinta/" + str(session["course"]))
 
 @app.route("/kurssivalinta")
 def choosecourse():
@@ -346,7 +357,7 @@ def choosecourse():
     return render_template("courselist.html", courses=courses)#something ain't right if this happens
 
 @app.route("/kurssihallinta/<int:id>")
-def editcourse(id):
+def managecourse(id):
     if not session.get("user_id"):
         return redirect("/")
     if session["authority"] != 2:
@@ -355,5 +366,9 @@ def editcourse(id):
     result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
     course = result.fetchone()
     if course:
-        return render_template("editcourse.html", course=course)
+        session["course"] = id
+        sql = "SELECT games.id, games.gamename FROM coursegames LEFT JOIN games ON coursegames.game_id=games.id WHERE coursegames.course_id=:course_id"
+        result = db.session.execute(sql, {"course_id": session["course"]})
+        games = result.fetchall()
+        return render_template("editcourse.html", course=course, games=games)
     return redirect("/kurssivalinta")#someone tried something funny, didn't work out
