@@ -54,7 +54,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    user.logout()
+    users.logout()
     return redirect("/")
 
 @app.route("/")

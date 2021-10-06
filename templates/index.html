@@ -1,31 +1,30 @@
+{% extends "layout.html" %}
+
+
+{% block header %}
 {% if session.user_id %}
-<h2>Hei, {{ session.firstname }}</h2>
-<p>Sinulla on {{session.points}} pistettä.</p>
+
+Hei, {{ session.firstname }}
+{% else %}
+<h2>Kirjaudu</h2>
+{% endif %}
+{% endblock %}
+
+
+
+
+
+{% block content %}
+{% if session.user_id %}
+Sinulla on {{session.points}} pistettä.<br>
 <h3>Valitse kieli:</h3>
 {% for lang in langs %}
 <a href="/kieli/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
 {% endfor %}
-<hr>
-{% if session.authority > 0 %}
-<a href="/uusikieli">Lisää kieli</a> >> 
-<a href="/uusipeli">Luo uusi peli</a> >> 
-<a href="/omatpelit">Katso omia pelejäsi</a> >> 
-{% if session.authority == 2 %}
-{% if session.school %}
-<a href="/kouluhallinta">Muokkaa koulusi tiedot</a> >> 
-{% else %}
-<a href="/uusikoulu">Lisää koulu sinun tietoosi</a> >> 
-{% endif %}
-<a href="/luokurssi">Luo kurssi</a> >>
-<a href="/kurssivalinta">Muokkaa kursseja</a> >>
-{% endif %}
-{% endif %}
-{% if session.authority == 10000 %}
-<a href="/admin">Näytä hallintanäkymä</a> >>
-{% endif %}
-<a href="/logout">Kirjaudu ulos</a>
+
 
 {% else %}
+
 <form action="/login" method="POST">
 <p>Tunnus:<br>
 <input type="text" name="username"></p>
@@ -33,4 +32,6 @@
 <input type="password" name="passw"></p>
 <input type="submit" value="Kirjaudu">
 <a href="/newuser">Rekisteröidy</a>
+
 {% endif %}
+{% endblock %}
