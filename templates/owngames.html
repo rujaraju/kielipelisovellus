@@ -22,7 +22,7 @@
         Ei
         {% endif %}
     </td>
-    <td><a href={{'/deaktivoi/' +  game.id|string }}>Valitse</a></td>
+    <td><a class="btn btn-warning" href={{'/deaktivoi/' +  game.id|string }} role="button">Valitse</a></td>
 </tr>
 {% endfor %}
 </table>

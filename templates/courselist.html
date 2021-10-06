@@ -1,20 +1,26 @@
+{% extends "layout.html" %}
+
+
+{% block header %}
+<h2>Hei, {{ session.firstname }}</h2>
 {% if courses %}
-<p>Valitse minkä kurssin haluat muokata.</p>
+<p>Valitse minkä kurssin<br />haluat muokata</p>
+{% else %}
+<p>Sinulla ei ole tällä hetkellä<br /> voimassa olevia kursseja</p>
+{% endif %}
+{% endblock %}
 
+
+{% block content %}
+<table class="table">
 {% for course in courses %}
-<p>{{course.coursename}}<a href="/kurssihallinta/{{course.id}}">(muokkaa)</a></p>
+<tr>
+    <td>{{ course.coursename }}</td>
+    <td>Lisää infoa jos visible</td>
+    <td><a class="btn btn-primary" href="/kurssihallinta/{{course.id}}" role="button">Muokkaa</a></td>
+
+</tr>
 {% endfor %}
+</table>
 
-{% else %}
-
-Sinulla ei ole tällä hetkellä voimassa olevia kursseja.
-
-{% endif %}
-<a href="/luokurssi">Luo uukurssi</a>
-<hr>
-<a href="/">Palaa pääsivulle</a>
-{% if session.school %}
-<a href="/kouluhallinta">Muokkaa koulusi tiedot</a> >> 
-{% else %}
-<a href="/uusikoulu">Lisää koulu sinun tietoosi</a> >> 
-{% endif %}
+{% endblock %}

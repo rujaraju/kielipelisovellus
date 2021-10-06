@@ -16,10 +16,11 @@ input[type="submit"]{
     width: 200px;
 }
 
-.editschool h4 {
-    margin-bottom: -15px;
-}
 
 form .btn {
     width: 200px;
+}
+
+.editcourse input[name="coursename"]{
+    width: 500px;
 }

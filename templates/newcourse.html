@@ -1,9 +1,25 @@
-<form action="/createcourse" method="POST">
-<p>Kurssin nimi:<br>
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Tässä voit lisätä kurssin</p>
+
+{% endblock %}
+
+
+{% block content %}
+
+<form class="editcourse" action="/createcourse" method="POST">
+<h4>Kurssin nimi:</h4>
 <input type="text" name="coursename"></p>
-<p>Kuvaus:<br>
+<h4>Kuvaus:</h4>
 <textarea name="info" style="width:500px; height:150px;">
 </textarea><br>
 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-<input type="submit" value="Tallenna">
+<input type="submit" class="btn btn-success" value="Tallenna">
+<a class="btn btn-warning" href="/luokurssi" role="button">Eiku</a>
 </form>
+
+{% endblock %}
