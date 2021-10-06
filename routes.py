@@ -280,47 +280,6 @@ def editcourse():
     db.session.commit()
     return redirect("/kurssihallinta/" + str(session["course"]))
 
-@app.route("/kielivalinta")
-def chooselang():
-    if not session.get("user_id"):
-        return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can create courses
-    sql = "SELECT langname FROM langs ORDER BY langname"
-    result = db.session.execute(sql)
-    langs = result.fetchall()
-    sql = "SELECT coursename FROM courses WHERE id=:course_id"
-    result = db.session.execute(sql, {"course_id":session["course"]})
-    coursename = result.fetchone()[0]
-    return render_template("chooselang.html", langs=langs, coursename=coursename)
-
-@app.route("/pelivalinta/<langname>")
-def choosegame(langname):
-    if not session.get("user_id"):
-        return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can create courses
-    langname = langname.capitalize()
-    sql = "SELECT id FROM langs where langname=:langname"
-    result = db.session.execute(sql, {"langname":langname})
-    result = result.fetchone()
-    if (result):
-        lang_id = result[0]
-        sql = "SELECT id, gamename FROM games WHERE lang_id=:lang_id;"
-        result = db.session.execute(sql, {"lang_id":lang_id})
-        games = result.fetchall()
-        print(games)
-        sql = "SELECT coursename FROM courses WHERE id=:course_id"
-        result = db.session.execute(sql, {"course_id":session["course"]})
-        coursename = result.fetchone()[0]
-        sql = "SELECT game_id from coursegames WHERE course_id=:course_id"
-        result = db.session.execute(sql, {"course_id":session["course"]})
-        chosen = result.fetchall()
-        print(chosen)
-        session["langname"] = langname
-        return render_template("choosegame.html", games=games, coursename=coursename, chosen=chosen)
-    return redirect("/kielivalinta")
-
 @app.route("/choosegame", methods=["POST"])
 def coursegame():
     if session["csrf_token"] != request.form["csrf_token"]:
@@ -329,7 +288,7 @@ def coursegame():
     sql = "INSERT INTO coursegames (game_id, course_id) VALUES (:game_id, :course_id)"
     db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
     db.session.commit()
-    return redirect("/pelivalinta/" + session["langname"])
+    return redirect("/kurssihallinta/"+str(session["course"]) +"/"+ session["langname"])
 
 @app.route("/unchoosegame", methods=["POST"])
 def delcoursegame():
@@ -342,7 +301,7 @@ def delcoursegame():
     db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
     db.session.commit()
     if session.get("langname"):#game was unchosen from gamemenu
-        return redirect("/pelivalinta/" + session["langname"])
+        return redirect("/kurssihallinta/"+str(session["course"]) +"/"+ session["langname"])
     return redirect("/kurssihallinta/" + str(session["course"]))
 
 @app.route("/kurssivalinta")
@@ -362,6 +321,8 @@ def managecourse(id):
         return redirect("/")
     if session["authority"] != 2:
         return redirect("/") #only schooladmins can edit courses
+    if session.get("langname"):
+        del session["langname"]
     sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
     result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
     course = result.fetchone()
@@ -371,4 +332,53 @@ def managecourse(id):
         result = db.session.execute(sql, {"course_id": session["course"]})
         games = result.fetchall()
         return render_template("editcourse.html", course=course, games=games)
+    return redirect("/kurssivalinta")#someone tried something funny, didn't work out
+
+@app.route("/kurssihallinta/<int:id>/kielet")
+def managecourselangs(id):
+    if not session.get("user_id"):
+        return redirect("/")
+    if session["authority"] != 2:
+        return redirect("/") #only schooladmins can edit courses
+    sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
+    result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
+    course = result.fetchone()
+    if course:
+        session["course"] = id
+        sql = "SELECT games.id, games.gamename FROM coursegames LEFT JOIN games ON coursegames.game_id=games.id WHERE coursegames.course_id=:course_id"
+        result = db.session.execute(sql, {"course_id": session["course"]})
+        games = result.fetchall()
+        sql = "SELECT langname FROM langs ORDER BY langname"
+        result = db.session.execute(sql)
+        langs = result.fetchall()
+        return render_template("editcourse.html", course=course, games=games, langs=langs)
+    return redirect("/kurssivalinta")#someone tried something funny, didn't work out
+
+@app.route("/kurssihallinta/<int:id>/<langname>")
+def managecoursegames(id, langname):
+    if not session.get("user_id"):
+        return redirect("/")
+    if session["authority"] != 2:
+        return redirect("/") #only schooladmins can edit courses
+    langname = langname.capitalize()
+    sql = "SELECT id FROM langs where langname=:langname"
+    result = db.session.execute(sql, {"langname":langname})
+    result = result.fetchone()
+    if (result):
+        lang_id = result[0]
+        sql = "SELECT id, gamename FROM games WHERE lang_id=:lang_id;"
+        result = db.session.execute(sql, {"lang_id":lang_id})
+        games = result.fetchall()
+        sql = "SELECT game_id from coursegames WHERE course_id=:course_id"
+        result = db.session.execute(sql, {"course_id":session["course"]})
+        chosen = result.fetchall()
+        session["langname"] = langname
+        sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
+        result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
+        course = result.fetchone()
+        if course:
+            sql = "SELECT langname FROM langs ORDER BY langname"
+            result = db.session.execute(sql)
+            langs = result.fetchall()
+            return render_template("editcourse.html", langs=langs, gameview=True, course=course, games=games, chosen=chosen)
     return redirect("/kurssivalinta")#someone tried something funny, didn't work out

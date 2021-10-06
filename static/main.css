@@ -24,3 +24,7 @@ form .btn {
 .editcourse input[name="coursename"]{
     width: 500px;
 }
+
+.langbutton {
+    margin-bottom: 5px;
+}

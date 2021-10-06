@@ -1,8 +1,0 @@
-<p>Olet kiinnittämässä kurssin "{{ coursename }}" peleihin.</p>
-
-<p>Valitse kieli:</p>
-{% for lang in langs %}
-<a href="/pelivalinta/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
-{% endfor %}
-<hr>
-<a href="/">Palaa pääsivulle</a>

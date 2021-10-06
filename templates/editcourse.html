@@ -4,13 +4,53 @@
 {% block header %}
 
 <h2>Hei, {{ session.firstname }}</h2>
+{% if gameview %}
+<a class="btn btn-primary langbutton" href="/kurssihallinta/{{ session.course }}" role="button">Muokkaa kurssin perustiedot</a> <br>
+{% else %}
 <p>Tässä voit muokata kurssin tiedot</p>
+{% endif %}
+{% if langs %}
+{% for lang in langs %}
+<a class="btn btn-primary langbutton" href="/kurssihallinta/{{ session.course }}/{{ lang.langname.lower() }}" role="button">{{ lang.langname}}</a> <br>
+{% endfor %}
+{% else %}
+<a class="btn btn-primary" href="/kurssihallinta/{{session.course}}/kielet" role="button">Kiinnitä kurssi peleihin</a>
+{% endif %}
 
 {% endblock %}
 
 
 {% block content %}
+{% if gameview %}
+<table class="table">
+{% for game in games %}
+<tr>
+    <td style="width:300px">
+        {{game.gamename}}
+        {% if (game.id,) not in chosen %}{% else %} <i>(valittu)</i>{% endif %}
+    </td>
+    <td>
+        {% if (game.id,) not in chosen %}
+        <form action="/choosegame" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+          <input type="hidden" name="game_id" value="{{ game.id }}">
+          <input class="btn btn-success" type="submit" value="Valitse">
+        </form  >  
+        {% else %}
+        <form action="/unchoosegame" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+          <input type="hidden" name="game_id" value="{{ game.id }}">
+          
+          <input class="btn btn-danger" type="submit" value="Poista valinta">
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
 
+
+{% else %}
 <form class="editcourse" action="/createcourse" method="POST">
     <h4>Kurssin nimi:</h4>
         <textarea name="coursename" style="width:500px; height:40px;">
@@ -22,20 +62,35 @@
         </textarea><br>
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
         <input type="submit" class="btn btn-success" value="Tallenna">
-        <a class="btn btn-warning" href="/luokurssi" role="button">Eiku</a>
+        <a class="btn btn-warning" href="/kurssivalinta" role="button">Eiku</a>
     </form>
-    {% if games %}
-    Tämä kurssi on kiinnitetty peleihin:
-    {% for game in games %}
-    <form action="/unchoosegame" method="POST">
-        {{game.gamename}}
-        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-        <input type="hidden" name="game_id" value="{{ game.id }}">
-        <input type="submit" value="Poista peli">
-      </form  >
-    {% endfor %}
+
+
+{% if games %}
+<br />
+    <h4>Tämä kurssi on kiinnitetty peleihin:</h4>
+    <table class="table">
+        {% for game in games %}
+        <tr>
+            <td style="width:300px">
+                {{game.gamename}}
+                <i>(valittu)</i>
+            </td>
+            <td>
+                <form action="/unchoosegame" method="POST">
+                  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
+                  <input type="hidden" name="game_id" value="{{ game.id }}">
+                  
+                  <input class="btn btn-danger" type="submit" value="Poista valinta">
+                </form>
+
+            </td>
+        </tr>
+        {% endfor %}
+        </table>
+
     {% endif %}
-    <a href="/kielivalinta">Kiinnitä kurssi peleihin</a>
+{% endif %}    
 
 {% endblock %}
 
