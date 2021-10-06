@@ -1,5 +1,16 @@
-<p>Tämä on sinun suunnittelemasi pelit, {{ session.firstname }}!</p>
-<table>
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Tässä on sinun pelit</p>
+
+{% endblock %}
+
+
+{% block content %}
+<table class="table">
     <tr><th>Nimi</th><th>Pelikertoja</th><th>Aktiivinen</th><th>Piilota</th></tr>
 {% for game in games %}
 <tr>
@@ -15,4 +26,5 @@
 </tr>
 {% endfor %}
 </table>
-<a href="/">Palaa pääsivulle</a>
+
+{% endblock %}

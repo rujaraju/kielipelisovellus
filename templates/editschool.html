@@ -1,25 +1,40 @@
-<form action="/editschool" method="POST">
-<p>Koulun nimi:<br>
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Tässä sinun koulusi tiedot</p>
+
+{% endblock %}
+
+
+{% block content %}
+
+<form class="editschool" action="/editschool" method="POST">
+<h4>Koulun nimi:</h4><br>
 <textarea name="schoolname" style="width:500px; height:40px;">
 {{ school.schoolname }}
 </textarea>
-<p>Kuvaus:<br>
+<h4>Kuvaus:</h4><br>
 <textarea name="info" style="width:500px; height:150px;">
 {{school.info}}
 </textarea>
-<p>Osoite:<br>
+<h4>Osoite:</h4><br>
 <textarea name="address" style="width:500px; height:150px;">
 {{school.address}}
 </textarea>
-<p>Asiakaspalvelinpuh.nro:<br>
+<h4>Asiakaspalvelinpuh.nro:</h4><br>
 <textarea name="phone" style="width:500px; height:40px;">
 {{school.phone}}
 </textarea>
-<p>Interverkko-sivu:<br>
+<h4>Interverkko-sivu:</h4><br>
 <textarea name="www" style="width:500px; height:40px;">
 {{school.www}}
 </textarea><br>
 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-<input type="submit" value="Tallenna">
+<input type="submit" class="btn btn-success" value="Tallenna">
+<a class="btn btn-warning" href="/kouluhallinta" role="button">Eiku</a>
 </form>
-<a href="/">Palaa pääsivulle</a>
+
+{% endblock %}

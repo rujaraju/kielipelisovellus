@@ -1,4 +1,17 @@
-<form action="/creategame" method="POST">
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Täytä tiedot ja tallenna uusi peli</p>
+
+{% endblock %}
+
+
+{% block content %}
+
+<form class="newgame" action="/creategame" method="POST">
 <p>Pelin nimi:<br>
 <input type="text" name="gamename"></p>
 <label for="lang">Valitse kieli:</label>
@@ -8,46 +21,47 @@
     {% endfor %} 
   </select>
 <p>Lause 1:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 1:
 <input type="text" name="rightanswer"></p>
 <p>Lause 2:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 2:
 <input type="text" name="rightanswer"></p>
 <p>Lause 3:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 3:
 <input type="text" name="rightanswer"></p>
 <p>Lause 4:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 4:
 <input type="text" name="rightanswer"></p>
 <p>Lause 5:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 5:
 <input type="text" name="rightanswer"></p> 
 <p>Lause 6:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 6:
 <input type="text" name="rightanswer"></p> 
 <p>Lause 7:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 7:
 <input type="text" name="rightanswer"></p> 
 <p>Lause 8:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 8:
 <input type="text" name="rightanswer"></p>
 <p>Lause 9:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 9:
 <input type="text" name="rightanswer"></p>
 <p>Lause 10:
-<input type="text" name="sentence">
+<input type="text" name="sentence"><br />
 Oikea vastaus 10:
 <input type="text" name="rightanswer"></p>
 <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"> 
-<input type="submit" value="Tallenna">
+<input class="btn btn-success" type="submit" value="Tallenna">
+<a class="btn btn-warning" href="/luopeli" role="button">Eiku</a>
 </form>
-<a href="/">Palaa pääsivulle tallentamatta</a>
+{% endblock %}

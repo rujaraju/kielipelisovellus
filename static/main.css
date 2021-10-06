@@ -1,0 +1,25 @@
+.newgame input[name="sentence"] {
+    width: 500px;
+    margin-bottom: 5px;
+}
+
+.newgame input[name="gamename"] {
+    width: 500px;
+    margin-bottom: 5px;
+}
+
+.newgame input[name="rightanswer"] {
+    width: 250px;
+}
+
+input[type="submit"]{
+    width: 200px;
+}
+
+.editschool h4 {
+    margin-bottom: -15px;
+}
+
+form .btn {
+    width: 200px;
+}

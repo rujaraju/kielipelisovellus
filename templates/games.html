@@ -1,8 +1,20 @@
-<p>Hei, {{ session.firstname }}</p>
-<h3>Valitse peli:</h3>
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Pisteitä: {{session.points}}</p>
+
+{% endblock %}
+
+
+{% block content %}
+
 {% for game in games %}
-<a href="/peli/{{ game.id }}">{{ game.gamename}}</a> <br>
+<a class="btn btn-primary" href="/peli/{{ game.id }}" role="button" style="margin-bottom: 5px;">{{ game.gamename}}</a>
+
 {% endfor %}
-<hr>
-<a href="/">Palaa pääsivulle</a><br />
-<a href="/logout">Kirjaudu ulos</a>
+
+{% endblock %}
+

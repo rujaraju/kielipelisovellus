@@ -4,7 +4,8 @@
 {% block header %}
 {% if session.user_id %}
 
-Hei, {{ session.firstname }}
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Pisteitä: {{session.points}}</p>
 {% else %}
 <h2>Kirjaudu</h2>
 {% endif %}
@@ -16,10 +17,8 @@ Hei, {{ session.firstname }}
 
 {% block content %}
 {% if session.user_id %}
-Sinulla on {{session.points}} pistettä.<br>
-<h3>Valitse kieli:</h3>
 {% for lang in langs %}
-<a href="/kieli/{{ lang.langname.lower() }}">{{ lang.langname}}</a> <br>
+<a class="btn btn-primary" href="/kieli/{{ lang.langname.lower() }}" role="button" style="margin-bottom: 5px;">{{ lang.langname}}</a>
 {% endfor %}
 
 
