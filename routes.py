@@ -70,7 +70,7 @@ def index():
     sql = "SELECT id from langs"
     result = db.session.execute(sql)
     ids = result.fetchall()
-    return render_template("index.html", langs=langs, ids=ids)
+    return render_template("index.html", langs=langs, ids=ids, message="Testing this")
 
 @app.route("/omatpelit")
 def ownGames():

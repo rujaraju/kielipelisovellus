@@ -1,13 +1,27 @@
-<p>Tsemppiä, {{ session.firstname }}!</p>
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Tsemppiä, {{ session.firstname }}</h2>
 {% if session.current_points %}
-<p><i>Viimeksi kun pelasit tätä peliä ansaitsit {{session.current_points}} pistettä!</i></p>
+<p><i>Viimeksi kun pelasit tätä peliä<br /> ansaitsit {{session.current_points}} pistettä!</i></p>
+{% else %}
+<p>Käännä suomenkieliset sanat!</p>
 {% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
 <form action="/playgame" method="POST">
-<h2>{{ gamename }}</h2>
+<h4>{{ gamename }}</h4>
 {% for sentence in sentences %}
-<p>{{ sentence.info }}
-    <input type="text" name="answer" placeholder="Käännä sana"></p>
+<p>{{ sentence.info }}<br />
+    <input type="text" name="answer" placeholder="Käännös tänne"></p>
 {% endfor %}
-<input type="submit" value="Tallenna vastaus">
+<input type="submit" class="btn btn-success" value="Tallenna">
+<a class="btn btn-warning" href="/kurssivalinta" role="button">Eiku</a>
 </form>
-<a href="/">Peruuta</a>
+ {% endblock %}

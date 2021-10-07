@@ -1,30 +1,46 @@
 .newgame input[name="sentence"] {
-    width: 500px;
-    margin-bottom: 5px;
+  width: 500px;
+  margin-bottom: 5px;
 }
 
 .newgame input[name="gamename"] {
-    width: 500px;
-    margin-bottom: 5px;
+  width: 500px;
+  margin-bottom: 5px;
 }
 
 .newgame input[name="rightanswer"] {
-    width: 250px;
+  width: 250px;
 }
 
-input[type="submit"]{
-    width: 200px;
+input[type="submit"] {
+  width: 200px;
 }
-
 
 form .btn {
-    width: 200px;
+  width: 200px;
 }
 
-.editcourse input[name="coursename"]{
-    width: 500px;
+.editcourse input[name="coursename"] {
+  width: 500px;
 }
 
 .langbutton {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+.message {
+  background-color: aqua;
+  display: block;
+  height: 40px;
+  text-align: center;
+  padding-top: 5px;
+  margin-bottom: 10px;
+  display: none;
+}
+
+.whitespace {
+  display: block;
+  background-color: white;
+  height: 40px;
+  margin-bottom: 10px;
 }
