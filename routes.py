@@ -34,7 +34,7 @@ def newgame():
     langs = result.fetchall()
     return render_template("newgame.html", langs=langs)
 
-@app.route("/uusikoulu")
+@app.route("/luokoulu")
 def newschool():
     return render_template("newschool.html")
 
@@ -178,8 +178,8 @@ def createlang():
     sql = "SELECT * FROM langs WHERE langname=:langname"
     result = db.session.execute(sql, {"langname":langname})
     if result.fetchone():
-        print("Language exists")
-        return redirect("/newlanguage")
+        flash("Kieli on jo tallennettu", "error")
+        return redirect("/luokieli")
     sql = "INSERT INTO langs (langname) VALUES (:langname) RETURNING id"
     result = db.session.execute(sql, {"langname":langname})
     lang_id = result.fetchone()[0]
@@ -201,12 +201,11 @@ def creategame():
     if not lang_id:
         flash("Valitse kieli", "error")
         return redirect("/luopeli")
-    if len(sentences) < 3:
-        flash("Pelissä täytyy olla ainakin kolme lausetta", "error")
-        return redirect("/luopeli")
-    if len(sentences) != len(rightanswers):
-        flash("Jokaiselle lauseelle pitää olla oikea vastaus", "error")
-        return redirect("/luopeli")
+    for i in range(len(sentences)):
+        if (len(sentences[i])) == 0:
+            if i < 3:
+                flash("Kirjoita ainakin kolme lausetta, kiitos", "error")
+                return redirect("/luopeli")
     sql = "SELECT * FROM games WHERE gamename=:gamename"
     result = db.session.execute(sql, {"gamename":gamename})
     if result.fetchone():
