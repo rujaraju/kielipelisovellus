@@ -1,5 +1,5 @@
 from app import app
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, flash 
 from os import abort
 from os import getenv
 from db import db
@@ -9,32 +9,26 @@ app.secret_key = getenv("SECRET_KEY")
 
 @app.route("/luotunnukset")
 def newuser():
-    if (session.get("user_id")):
+    if users.credentials(None, None):
         return redirect("/")
     return render_template("newuser.html")
 
 @app.route("/luokurssi")
 def newcourse():
-    if not session.get("user_id"):
+    if not users.credentials(2, None):
         return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can create courses
     return render_template("newcourse.html")
 
 @app.route("/luokieli")
 def newlanguage():
-    if not session.get("user_id"):
+    if not users.credentials(10000, None):#only admins can add languages
         return redirect("/")
-    if session["authority"] == 0:
-        return redirect("/") #normal user can't create games, all others can
     return render_template("newlanguage.html")
 
 @app.route("/luopeli")
 def newgame():
-    if not session.get("user_id"):
+    if not users.credentials(1, None):
         return redirect("/")
-    if session["authority"] == 0:
-        return redirect("/") #normal user can't create games, all others can
     sql = "SELECT id, langname FROM langs"
     result = db.session.execute(sql)
     langs = result.fetchall()
@@ -48,8 +42,9 @@ def newschool():
 def login():
     username = request.form["username"]
     passwToCheck = request.form["passw"]
-    if(users.login(username, passwToCheck)):
-        return redirect("/")    
+    if len(username) > 0 and len(passwToCheck) > 0:
+        if(users.login(username, passwToCheck)):
+            return redirect("/")    
     return render_template("index.html", error="Tarkista kirjautumistietosi.")
 
 @app.route("/logout")
@@ -59,7 +54,7 @@ def logout():
 
 @app.route("/")
 def index():
-    if session:
+    if users.credentials(None, None):
         if session.get("langname"):#if returning from editing courses
             del session["langname"]
         if session.get("course"):#if returning from editing courses
@@ -78,17 +73,14 @@ def ownGames():
 
 @app.route("/kieli/<langname>")
 def language(langname):
-    if not session.get("user_id"):
+    if not users.credentials(None, None):
         return redirect("/")
-    print(langname)
     langname = langname.capitalize()
-    print(langname)
     sql = "SELECT id FROM langs where langname=:langname"
     result = db.session.execute(sql, {"langname":langname})
     result = result.fetchone()
     if (result):
         lang_id = result[0]
-        print(str(lang_id))
         sql = "SELECT id, gamename FROM games where lang_id=:lang_id"
         result = db.session.execute(sql, {"lang_id":lang_id})
         games = result.fetchall()
@@ -97,7 +89,7 @@ def language(langname):
 
 @app.route("/peli/<int:game_id>")
 def game(game_id):
-    if not session.get("user_id"):
+    if not users.credentials(None, None):
         return redirect("/")
     sql = "SELECT gamename FROM games where id=:id"
     result = db.session.execute(sql, {"id":game_id})
@@ -116,7 +108,7 @@ def game(game_id):
 
 @app.route("/kouluhallinta")
 def editschool():
-    if not session.get("school"):
+    if not users.credentials(None, "school"):
         return redirect("/")
     sql = "SELECT * FROM schools WHERE id=:school_id"
     result = db.session.execute(sql, {"school_id": session["school"]})
@@ -158,6 +150,9 @@ def createuser():
     firstname = request.form["firstname"]
     lastname = request.form["lastname"]
     passw = request.form["passw"]
+    if len(username) < 2 or len(firstname) < 2 or len(lastname) < 2 or len(passw) < 2:
+        flash("Täytä lomake huolellisesti", "error")
+        return redirect("/luotunnukset")
     authority = int(request.form["authority"])
     sql = "SELECT * FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username":username})
@@ -169,13 +164,16 @@ def createuser():
     user_id = result.fetchone()[0]
     print(user_id)
     db.session.commit()
-    return redirect("/newuser")
+    return redirect("/")
 
 @app.route("/createlang", methods=["POST"])
 def createlang():
     if session["csrf_token"] != request.form["csrf_token"]:
         abort(403)
     langname = request.form["langname"]
+    if len(langname) < 3:
+        flash("Kielen nimi liian lyhyt", "error")
+        return redirect("/luokieli")
     langname = langname.capitalize()
     sql = "SELECT * FROM langs WHERE langname=:langname"
     result = db.session.execute(sql, {"langname":langname})
@@ -195,17 +193,28 @@ def creategame():
         abort(403)
     gamename = request.form["gamename"]
     lang_id = request.form["lang_id"]
+    sentences = request.form.getlist("sentence")
+    rightanswers = request.form.getlist("rightanswer")
+    if len(gamename) < 3:
+        flash("Kielen nimi on lian lyhyt", "error")
+        return redirect("/luopeli")
+    if not lang_id:
+        flash("Valitse kieli", "error")
+        return redirect("/luopeli")
+    if len(sentences) < 3:
+        flash("Pelissä täytyy olla ainakin kolme lausetta", "error")
+        return redirect("/luopeli")
+    if len(sentences) != len(rightanswers):
+        flash("Jokaiselle lauseelle pitää olla oikea vastaus", "error")
+        return redirect("/luopeli")
     sql = "SELECT * FROM games WHERE gamename=:gamename"
     result = db.session.execute(sql, {"gamename":gamename})
     if result.fetchone():
-        print("game exists")
-        return redirect("/newgame") # to add: errormessage
+        flash("Kielen nimi on jo käytössä", "error")
+        return redirect("/luopeli")
     sql = "INSERT INTO games (gamename, lang_id, creator_id) VALUES (:gamename, :lang_id, :user_id) RETURNING id"
     result = db.session.execute(sql, {"gamename":gamename, "lang_id":lang_id, "user_id": session["user_id"]})
     games_id = result.fetchone()[0]
-    print("games id " + str(games_id))
-    sentences = request.form.getlist("sentence")
-    rightanswers = request.form.getlist("rightanswer")
     for i in range(len(sentences)):
         if (len(sentences[i])) == 0:
             break
@@ -216,11 +225,16 @@ def creategame():
 
 @app.route("/createschool", methods=["POST"])
 def createschool():
+    if session["csrf_token"] != request.form["csrf_token"]:
+        abort(403)
     schoolname = request.form["schoolname"]
     info = request.form["info"]
     address = request.form["address"]
     phone = request.form["phone"]
     www = request.form["www"]
+    if len(schoolname) < 3 or len(info) < 10 or len(address) < 10 or len(phone) < 4 or len(www) < 3:
+        flash("Tarkista, että kaikki kentät ovat oikein täytetty", "error")
+        return redirect("/luokoulu")
     sql = "INSERT INTO schools (schoolname, info, address, phone, www, visible) VALUES (:schoolname, :info, :address, :phone, :www, :visible) RETURNING id"
     result = db.session.execute(sql, {"schoolname":schoolname, "info": info, "address": address, "phone": phone, "www": www, "visible": True})
     school_id = result.fetchone()[0]
@@ -239,6 +253,9 @@ def saveeditschool():
     address = request.form["address"]
     phone = request.form["phone"]
     www = request.form["www"]
+    if len(schoolname) < 3 or len(info) < 10 or len(address) < 10 or len(phone) < 4 or len(www) < 3:
+        flash("Tarkista, että kaikki kentät ovat oikein täytetty", "error")
+        return redirect("/kouluhallinta")
     sql = "SELECT schoolname FROM schools WHERE id=:id"
     result = db.session.execute(sql, {"id": session["school"]})
     oldname = result.fetchone()[0]
@@ -246,7 +263,7 @@ def saveeditschool():
         sql = "SELECT * FROM schools WHERE schoolname=:schoolname"
         result = db.session.execute(sql, {"schoolname": schoolname})
         if result.fetchone():
-            print("the school already exists")
+            flash("Tämä koulunimi on jo käytössä muualla", "error")
             return redirect("/kouluhallinta")
     sql = "UPDATE schools SET schoolname=:schoolname, info=:info, address=:address, phone=:phone, www=:www WHERE id=:id"
     db.session.execute(sql, {"schoolname": schoolname, "info": info, "address": address, "phone": phone, "www": www, "id": session["school"]})
@@ -259,6 +276,9 @@ def createcourse():
         abort(403)
     coursename = request.form["coursename"]
     info = request.form["info"]
+    if len(coursename) < 3 or len(info) < 10:
+        flash("Kurssinimi tai -info oli liian lyhyt", "error")
+        return redirect("/luokurssi")
     sql = "INSERT INTO courses (coursename, info, school_id) VALUES (:coursename, :info, :school_id) RETURNING id"
     result = db.session.execute(sql, {"coursename":coursename, "info": info, "school_id": session["school"]})
     course_id = result.fetchone()[0]
@@ -272,6 +292,9 @@ def editcourse():
         abort(403)
     coursename = request.form["coursename"]
     info = request.form["info"]
+    if len(coursename) < 3 or len(info) < 10:
+        flash("Kurssinimi tai -info oli liian lyhyt", "error")
+        return redirect("/kurssihallinta/" + str(session["course"]))
     sql = "UPDATE courses SET coursename=:coursename, info=:info WHERE id=:id"
     db.session.execute(sql, {"coursename":coursename, "info": info, "id": session["course"]})
     db.session.commit()
@@ -289,11 +312,9 @@ def coursegame():
 
 @app.route("/unchoosegame", methods=["POST"])
 def delcoursegame():
-    print("doing anything")
     if session["csrf_token"] != request.form["csrf_token"]:
         abort(403)
     game_id = request.form["game_id"]
-    print(game_id, session["course"])
     sql = "DELETE FROM coursegames WHERE game_id=:game_id AND course_id=:course_id"
     db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
     db.session.commit()
@@ -303,10 +324,8 @@ def delcoursegame():
 
 @app.route("/kurssivalinta")
 def choosecourse():
-    if not session.get("user_id"):
+    if not users.credentials(2, None):
         return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can create courses
     sql = "SELECT * from courses WHERE school_id=:school_id AND visible=True"
     result = db.session.execute(sql, {"school_id": session["school"]})
     courses = result.fetchall()
@@ -314,10 +333,8 @@ def choosecourse():
 
 @app.route("/kurssihallinta/<int:id>")
 def managecourse(id):
-    if not session.get("user_id"):
+    if not users.credentials(2, None):
         return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can edit courses
     if session.get("langname"):
         del session["langname"]
     sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
@@ -333,10 +350,8 @@ def managecourse(id):
 
 @app.route("/kurssihallinta/<int:id>/kielet")
 def managecourselangs(id):
-    if not session.get("user_id"):
+    if not users.credentials(2, None):
         return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can edit courses
     sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
     result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
     course = result.fetchone()
@@ -353,10 +368,8 @@ def managecourselangs(id):
 
 @app.route("/kurssihallinta/<int:id>/<langname>")
 def managecoursegames(id, langname):
-    if not session.get("user_id"):
+    if not users.credentials(2, None):
         return redirect("/")
-    if session["authority"] != 2:
-        return redirect("/") #only schooladmins can edit courses
     langname = langname.capitalize()
     sql = "SELECT id FROM langs where langname=:langname"
     result = db.session.execute(sql, {"langname":langname})

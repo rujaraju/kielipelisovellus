@@ -62,7 +62,13 @@
     <div class="row">
       <div class="col-2"></div>
       <div id="whitespace" class="col-8 whitespace"></div>
-      <div id="message" class="col-8 message">{{ message }}</div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      {% for category, message in messages %}
+      <div id="{{category}}" class="col-8 {{category}}">{{ message }}</div>
+      {% endfor %}
+      {% endif %}
+      {% endwith %}            
       <div id="error" class="col-8 error">{{ error }}</div>
       <div class="col-2"></div>
     </div>
@@ -75,6 +81,7 @@
       <div class="col-6">{% block content %}{% endblock %}</div>
     </div>
   </div>
+
   <script>
       function message(message){
       var show = document.getElementById(message);
@@ -90,6 +97,13 @@
       }, 4500)
 
     }
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      message("{{category}}")
+    {% endfor %}    
+  {% endif %}
+{% endwith %}
     {% if message %}
         message("message")
     {% endif %}

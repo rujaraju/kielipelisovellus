@@ -29,10 +29,19 @@ def login(username, passwToCheck):
     return False
 
 def logout():
-    del session["user_id"], session["authority"], session["points"], session["firstname"]
-    if session.get("school"):
-        del session["school"]
-    if session.get("langname"):
-        del session["langname"]
-    if session.get("course"):
-        del session["course"]
+    keys = []
+    for key in session:
+        keys.append(key)
+    for key in keys:
+        del session[key]
+
+def credentials(authority, specific):
+    if not session.get("user_id"):
+        return False
+    if authority:
+        if session["authority"] < authority:#smallest authorityvalue accepted
+            return False
+    if specific:
+        if not session.get(specific):
+            return False
+    return True
