@@ -1,5 +1,5 @@
 from db import db
-from flask import session
+from flask import session, flash
 import secrets
 
 def login(username, passwToCheck):
@@ -44,4 +44,24 @@ def credentials(authority, specific):
     if specific:
         if not session.get(specific):
             return False
+    return True
+
+def addNew(form):
+    username = form["username"]
+    firstname = form["firstname"]
+    lastname = form["lastname"]
+    passw = form["passw"]
+    authority = int(form["authority"])
+    if len(username) < 2 or len(firstname) < 2 or len(lastname) < 2 or len(passw) < 2:
+        flash("Täytä lomake huolellisesti", "error")
+        return False
+    sql = "SELECT * FROM users WHERE username=:username"
+    result = db.session.execute(sql, {"username":username})
+    if result.fetchone():
+        flash("Käyttäjänimi on jo käytössä", "error")
+        return False
+    sql = "INSERT INTO users (username, firstname, lastname, passw, authority) VALUES (:username, :firstname, :lastname, :passw, :authority) RETURNING id"
+    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": authority})
+    user_id = result.fetchone()[0]
+    db.session.commit()
     return True

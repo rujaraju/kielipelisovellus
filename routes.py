@@ -3,7 +3,7 @@ from flask import redirect, render_template, request, session, flash
 from os import abort
 from os import getenv
 from db import db
-import users
+import users, languages, gamez, schoolz
 
 app.secret_key = getenv("SECRET_KEY")
 
@@ -29,9 +29,7 @@ def newlanguage():
 def newgame():
     if not users.credentials(1, None):
         return redirect("/")
-    sql = "SELECT id, langname FROM langs"
-    result = db.session.execute(sql)
-    langs = result.fetchall()
+    langs = languages.get()
     return render_template("newgame.html", langs=langs)
 
 @app.route("/luokoulu")
@@ -59,111 +57,52 @@ def index():
             del session["langname"]
         if session.get("course"):#if returning from editing courses
             del session["course"]
-    sql = "SELECT langname FROM langs ORDER BY langname"
-    result = db.session.execute(sql)
-    langs = result.fetchall()
+    langs = languages.get()
     return render_template("index.html", langs=langs)
 
 @app.route("/omatpelit")
 def ownGames():
-    sql = "SELECT * FROM games WHERE creator_id=:user_id ORDER BY visible"
-    result = db.session.execute(sql, {"user_id": session["user_id"]})
-    games = result.fetchall()
+    games = gamez.get()
     return render_template("owngames.html", games=games)
 
 @app.route("/kieli/<langname>")
 def language(langname):
     if not users.credentials(None, None):
         return redirect("/")
-    langname = langname.capitalize()
-    sql = "SELECT id FROM langs where langname=:langname"
-    result = db.session.execute(sql, {"langname":langname})
-    result = result.fetchone()
-    if (result):
-        lang_id = result[0]
-        sql = "SELECT id, gamename FROM games where lang_id=:lang_id"
-        result = db.session.execute(sql, {"lang_id":lang_id})
-        games = result.fetchall()
-        return render_template("games.html", games=games)
+    lang_id = languages.getId(langname)
+    if (lang_id):
+        return render_template("games.html", games=gamez.getByLang(lang_id))
     return redirect("/")
 
 @app.route("/peli/<int:game_id>")
 def game(game_id):
     if not users.credentials(None, None):
         return redirect("/")
-    sql = "SELECT gamename FROM games where id=:id"
-    result = db.session.execute(sql, {"id":game_id})
-    gamename = result.fetchone()[0]
-    sql = "SELECT id, info FROM sentences WHERE games_id=:id"
-    result = db.session.execute(sql, {"id":game_id})
-    sentences = result.fetchall()
-    sql = "SELECT points FROM points WHERE user_id=:user_id AND game_id=:game_id"
-    result = db.session.execute(sql, {"user_id": session["user_id"], "game_id": game_id})
-    result = result.fetchone()
-    if result:
-        print(result)
-        session["current_points"] = result[0]
-    session["game_id"] = game_id
-    return render_template("game.html", gamename=gamename, sentences=sentences)
+    game = gamez.getGame(game_id)
+    return render_template("game.html", gamename=game[0], sentences=game[1])
 
 @app.route("/kouluhallinta")
 def editschool():
     if not users.credentials(None, "school"):
         return redirect("/")
-    sql = "SELECT * FROM schools WHERE id=:school_id"
-    result = db.session.execute(sql, {"school_id": session["school"]})
-    school = result.fetchone()
+    school = schoolz.get()
     return render_template("editschool.html", school=school)
 
 @app.route("/playgame", methods=["POST"]) # to add here: page to show result from current game
 def playgame():
     answers = request.form.getlist("answer")
-    sql = "SELECT rightanswer FROM sentences WHERE games_id=:id"
-    result = db.session.execute(sql, {"id":session["game_id"]})
-    rightanswers = result.fetchall()
-    print(rightanswers) 
-    print(answers)
-    i = 0
-    points = 0
-    while i < len(rightanswers):
-        if rightanswers[i][0] == answers[i]:
-            points += 1
-        i += 1
-    if session.get("current_points"): #user has played this game before
-        if points > session["current_points"]: #only update if got more points this time around
-            sql = "UPDATE points SET points=:points WHERE game_id=:game_id AND user_id=:user_id"
-            db.session.execute(sql, {"points": points, "game_id": session["game_id"], "user_id": session["user_id"]})
-            session["points"] = session["points"] - session["current_points"] + points
-            del session["current_points"]
+    result = gamez.checkResult(answers)
+    if result[0]:
+        flash("Onnittelut, ansaitsit " + str(result[1]) + " pistettä!", "message")#move to gamezmodule?
     else:
-        sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
-        db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
-        session["points"] = session["points"] + points
-    db.session.commit()
-
-    del session["game_id"]
+        flash("Sait " + str(result[1]) + " pistettä, mutta tämä ei ollut parempaa tulosta kuin viimeksi", "message")
     return redirect("/")
 
 @app.route("/createuser", methods=["POST"])
 def createuser():
-    username = request.form["username"]
-    firstname = request.form["firstname"]
-    lastname = request.form["lastname"]
-    passw = request.form["passw"]
-    if len(username) < 2 or len(firstname) < 2 or len(lastname) < 2 or len(passw) < 2:
-        flash("Täytä lomake huolellisesti", "error")
+    success = users.addNew(request.form)
+    if not success:
         return redirect("/luotunnukset")
-    authority = int(request.form["authority"])
-    sql = "SELECT * FROM users WHERE username=:username"
-    result = db.session.execute(sql, {"username":username})
-    if result.fetchone():
-        print("User exists")
-        return redirect("/newuser")
-    sql = "INSERT INTO users (username, firstname, lastname, passw, authority) VALUES (:username, :firstname, :lastname, :passw, :authority) RETURNING id"
-    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": authority})
-    user_id = result.fetchone()[0]
-    print(user_id)
-    db.session.commit()
     return redirect("/")
 
 @app.route("/createlang", methods=["POST"])
