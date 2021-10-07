@@ -50,7 +50,7 @@ def login():
     passwToCheck = request.form["passw"]
     if(users.login(username, passwToCheck)):
         return redirect("/")    
-    return render_template("index.html", message="Tarkista kirjautumistietosi.")
+    return render_template("index.html", error="Tarkista kirjautumistietosi.")
 
 @app.route("/logout")
 def logout():
@@ -67,10 +67,7 @@ def index():
     sql = "SELECT langname FROM langs ORDER BY langname"
     result = db.session.execute(sql)
     langs = result.fetchall()
-    sql = "SELECT id from langs"
-    result = db.session.execute(sql)
-    ids = result.fetchall()
-    return render_template("index.html", langs=langs, ids=ids, message="Testing this")
+    return render_template("index.html", langs=langs)
 
 @app.route("/omatpelit")
 def ownGames():

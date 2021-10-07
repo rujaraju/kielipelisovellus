@@ -1,3 +1,9 @@
+.navbar {
+    background-color: blueviolet;
+    margin-bottom: 10px;
+    color: white;
+}
+
 .newgame input[name="sentence"] {
   width: 500px;
   margin-bottom: 5px;
@@ -28,19 +34,26 @@ form .btn {
   margin-bottom: 5px;
 }
 
-.message {
-  background-color: aqua;
+.message, .error, .whitespace {
+  color: white;
   display: block;
   height: 40px;
   text-align: center;
   padding-top: 5px;
   margin-bottom: 10px;
-  display: none;
+  transition: opacity 1s; 
 }
+
+.message {
+    background-color: rgb(73, 100, 255);
+    display: none;
+}
+.error {
+    background-color: rgb(255, 62, 62);
+    display: none;
+  }
 
 .whitespace {
   display: block;
   background-color: white;
-  height: 40px;
-  margin-bottom: 10px;
 }
