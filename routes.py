@@ -3,7 +3,9 @@ from flask import redirect, render_template, request, session, flash
 from os import abort
 from os import getenv
 from db import db
-import users, languages, gamez, schoolz, coursez
+#import modules.gamez as gamez
+from modules import users, languages, schoolz, coursez, gamez
+#import users, languages, schoolz, coursez
 
 app.secret_key = getenv("SECRET_KEY")
 
