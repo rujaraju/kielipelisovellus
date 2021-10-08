@@ -15,8 +15,25 @@
 {% block content %}
 {% if session.user_id %}
 {% for lang in langs %}
-<a class="btn btn-primary" href="/kieli/{{ lang.langname.lower() }}" role="button" style="margin-bottom: 5px;">{{ lang.langname}}</a>
+<a style="width: 300px; margin-bottom: 5px;"class="btn btn-primary" href="/kieli/{{ lang.langname.lower() }}" role="button" style="margin-bottom: 5px;">{{ lang.langname}}</a><br>
 {% endfor %}
+
+<table class="table">
+    <tr>
+        <th>Nimi</th>
+        <th>Pisteet</th>
+    </tr>
+{% for score in scores %}
+<tr>
+    <td>
+        {{ score.firstname }} {{ score.lastname }}
+    </td>
+    <td>
+        {{ score.points }}
+    </td>
+</tr>
+{% endfor %}
+</table>
 
 
 {% else %}

@@ -56,7 +56,10 @@ def index():
         if session.get("course"):#if returning from editing courses
             del session["course"]
     langs = languages.get()
-    return render_template("index.html", langs=langs)
+    sql = "SELECT users.firstname AS firstname, users.lastname AS lastname, SUM (points.points) AS points FROM points LEFT JOIN users ON users.id=points.user_id group by users.firstname, users.lastname ORDER BY sum(points.points) DESC LIMIT 3"
+    result = db.session.execute(sql)
+    scores = result.fetchall()
+    return render_template("index.html", langs=langs, scores=scores)
 
 @app.route("/omatpelit")
 def ownGames():
