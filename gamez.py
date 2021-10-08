@@ -9,7 +9,7 @@ def get():
     return games
 
 def getByLang(lang_id):
-        sql = "SELECT id, gamename FROM games where lang_id=:lang_id"
+        sql = "SELECT id, gamename FROM games where lang_id=:lang_id AND visible=True"
         result = db.session.execute(sql, {"lang_id":lang_id})
         games = result.fetchall()
         return games
@@ -33,6 +33,8 @@ def getGame(game_id):
     return (gamename, sentences)
 
 def checkResult(answers):
+    sql = "UPDATE games SET playcount=playcount+1 where id=:id"
+    db.session.execute(sql, {"id": session["game_id"]})
     sql = "SELECT rightanswer FROM sentences WHERE games_id=:id"
     result = db.session.execute(sql, {"id":session["game_id"]})
     rightanswers = result.fetchall()
@@ -95,7 +97,7 @@ def create(form):
     return True
 
 def getchosen():
-    sql = "SELECT games.id, games.gamename FROM coursegames LEFT JOIN games ON coursegames.game_id=games.id WHERE coursegames.course_id=:course_id"
+    sql = "SELECT games.id, games.gamename FROM coursegames LEFT JOIN games ON coursegames.game_id=games.id WHERE coursegames.course_id=:course_id AND games.visible=True"
     result = db.session.execute(sql, {"course_id": session["course"]})
     chosen = result.fetchall()
     print("chosen")
@@ -117,4 +119,19 @@ def unchoose(form):
     sql = "DELETE FROM coursegames WHERE game_id=:game_id AND course_id=:course_id"
     db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
     db.session.commit()
-    
+
+def hide(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    game_id = form["game_id"]
+    sql = "UPDATE games SET visible=false WHERE id=:game_id"
+    db.session.execute(sql, {"game_id": game_id})
+    db.session.commit()
+
+def show(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    game_id = form["game_id"]
+    sql = "UPDATE games SET visible=True WHERE id=:game_id"
+    db.session.execute(sql, {"game_id": game_id})
+    db.session.commit()

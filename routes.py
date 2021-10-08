@@ -77,7 +77,15 @@ def game(game_id):
     if not users.credentials(None, None):
         return redirect("/")
     game = gamez.getGame(game_id)
-    return render_template("game.html", gamename=game[0], sentences=game[1])
+    courses = coursez.getRelevant(game_id)
+    return render_template("game.html", courses=courses, gamename=game[0], sentences=game[1])
+
+@app.route("/kurssi/<int:id>")
+def course(id):
+    course = coursez.getPres(id)
+    if course:
+        return render_template("course.html", course=course)
+    return redirect("/")#someone tried something funny
 
 @app.route("/kouluhallinta")
 def editschool():
@@ -148,7 +156,15 @@ def delcoursegame():
         return redirect("/kurssihallinta/"+str(session["course"]) +"/"+ session["langname"])
     return redirect("/kurssihallinta/" + str(session["course"]))
 
-#@app.route("/delgame", methods=["POST"])
+@app.route("/hidegame", methods=["POST"])
+def hidegame():
+    gamez.hide(request.form)
+    return redirect("/omatpelit")
+
+@app.route("/showgame", methods=["POST"])
+def showgame():
+    gamez.show(request.form)
+    return redirect("/omatpelit")
 
 @app.route("/kurssivalinta")
 def choosecourse():

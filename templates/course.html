@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+<p>Eikö näytä hyvältä kurssilta?</p>
+<a class="btn btn-primary" href="/peli/{{session['game_id']}}" role="button">Palaa peliin</a>
+
+{% endblock %}
+
+
+{% block content %}
+<h4>Kurssin nimi:</h4>
+<p>{{ course.coursename }}</p>
+<h4>Kurssikuvaus:</h4>
+<p>{{ course.courseinfo }}</p>
+<h4>Koulun nimi:</h4>
+<p> {{ course.schoolname }}</p>
+<h4>Infoa koulusta:</h4>
+<p>{{ course.schoolinfo }}</p>
+<h4>Osoite:</h4>
+<p>{{ course.address }}</p>
+<h4>Asiakaspalvelinpuh.nro:</h4>
+<p>{{ course.phone }}</p>
+<h4>Interverkko-sivu:</h4>
+<p><a href="https://{{course.www}}" target="_blank">{{ course.www }}</a></p>
+
+
+{% endblock %}

@@ -22,16 +22,28 @@
         Ei
         {% endif %}
     </td>
-    <td>      
-    <form action="/delgame" method="POST">
+    <td>
+    {% if game.visible == True %}     
+    <form action="/hidegame" method="POST">
         <input
           type="hidden"
           name="csrf_token"
           value="{{ session.csrf_token }}"
         />
         <input type="hidden" name="game_id" value="{{ game.id }}" />
-        <input class="btn btn-danger" style="width: 100px;" type="submit" value="Poista" />
-      </form>
+        <input class="btn btn-danger" style="width: 100px;" type="submit" value="Piilota" />
+    </form>
+    {% else %}
+    <form action="/showgame" method="POST">
+        <input
+          type="hidden"
+          name="csrf_token"
+          value="{{ session.csrf_token }}"
+        />
+        <input type="hidden" name="game_id" value="{{ game.id }}" />
+        <input class="btn btn-success" style="width: 100px;" type="submit" value="Aktivoi" />
+    </form>
+    {% endif %}
 </tr>
 {% endfor %}
 </table>

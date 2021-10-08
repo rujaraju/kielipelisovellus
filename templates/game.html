@@ -9,7 +9,13 @@
 {% else %}
 <p>Käännä suomenkieliset sanat!</p>
 {% endif %}
-
+{% if courses %}
+<div>Sinua saattaisi kiinnostaa kurssit:</i><br>
+{% for course in courses %}
+<b><i>{{course.coursename}}</i></b><br> {{ course.info[0:100]}} ... <a href="/kurssi/{{course.id}}">Lue lisää!</a><br>
+{% endfor %}
+</div>
+{% endif %}
 {% endblock %}
 
 

@@ -8,6 +8,12 @@ def get():
     courses = result.fetchall()
     return courses
 
+def getPres(id):
+    sql = "SELECT courses.coursename AS coursename, courses.info AS courseinfo, schools.schoolname AS schoolname, schools.info AS schoolinfo, schools.address AS address, schools.phone AS phone, schools.www AS www FROM courses LEFT JOIN schools ON courses.school_id=schools.id WHERE courses.id=:id"
+    result = db.session.execute(sql, {"id": id})
+    course = result.fetchone()
+    return course
+
 def create(form):
     if session["csrf_token"] != form["csrf_token"]:
         abort(403)
@@ -41,3 +47,9 @@ def check(id):
     result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
     course = result.fetchone()
     return course
+
+def getRelevant(game_id):
+    sql = "select courses.id AS id, courses.coursename AS coursename, courses.info AS info from courses LEFT JOIN coursegames ON courses.id=coursegames.course_id LEFT JOIN games ON coursegames.game_id=games.id WHERE games.id=:game_id ORDER BY RANDOM () LIMIT 4"
+    result = db.session.execute(sql, {"game_id": game_id})
+    courses = result.fetchall()
+    return courses
