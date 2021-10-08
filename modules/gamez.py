@@ -1,4 +1,4 @@
-from db import db
+from modules.db import db
 from flask import session, flash
 from os import abort
 
