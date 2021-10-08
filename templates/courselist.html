@@ -16,7 +16,12 @@
 {% for course in courses %}
 <tr>
     <td>{{ course.coursename }}</td>
-    <td>Lisää infoa jos visible</td>
+    <td>{% if course.visible %}
+        Aktiivinen
+        {% else %}
+        Ei aktiivinen
+        {% endif %}
+    </td>
     <td><a class="btn btn-primary" href="/kurssihallinta/{{course.id}}" role="button">Muokkaa</a></td>
 
 </tr>

@@ -11,6 +11,7 @@
 <br />
 {% else %}
 <p>Tässä voit muokata kurssin tiedot</p>
+
 {% endif %} {% if langs %} {% for lang in langs %}
 <a
   class="btn btn-primary langbutton"
@@ -26,7 +27,24 @@
   role="button"
   >Kiinnitä kurssi peleihin</a
 >
-{% endif %} {% endblock %} {% block content %} {% if gameview %}
+{% if course.visible %}
+<form style="margin-top: 5px" class="hidecourse" action="/hidecourse" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+  <input type="hidden" name="course_id" value="{{ course.id }}" />
+  <input type="submit" class="btn btn-danger" value="Piilota tämä kurssi" />
+</form>
+{% else %}
+<form style="margin-top: 5px" class="hidecourse" action="/hidecourse" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+  <input type="hidden" name="course_id" value="{{ course.id }}" />
+  <input type="submit" class="btn btn-success" value="Aktivoi tämä kurssi" />
+</form>
+{% endif %}
+{% endif %} 
+{% endblock %} 
+{% block content %} 
+
+{% if gameview %}
 <table class="table">
   {% for game in games %}
   <tr>

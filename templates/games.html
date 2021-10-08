@@ -4,15 +4,15 @@
 {% block header %}
 
 <h2>Hei, {{ session.firstname }}</h2>
-<p>Pisteitä: {{session.points}}</p>
-
+<p>Sinun pisteet: {{session.points}}</p>
+<a class="btn btn-success" href="/" role="button">Päävalikkoon</a>
 {% endblock %}
 
 
 {% block content %}
 
 {% for game in games %}
-<a class="btn btn-primary" href="/peli/{{ game.id }}" role="button" style="margin-bottom: 5px;">{{ game.gamename}}</a>
+<a style="width: 300px; margin-bottom: 5px;" class="btn btn-primary" href="/peli/{{ game.id }}" role="button" style="margin-bottom: 5px;">{{ game.gamename}}</a><br>
 
 {% endfor %}
 

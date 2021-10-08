@@ -135,3 +135,9 @@ def show(form):
     sql = "UPDATE games SET visible=True WHERE id=:game_id"
     db.session.execute(sql, {"game_id": game_id})
     db.session.commit()
+
+def scores():
+    sql = "SELECT users.username AS username, SUM (points.points) AS points FROM points LEFT JOIN users ON users.id=points.user_id group by users.username ORDER BY sum(points.points) DESC LIMIT 20"
+    result = db.session.execute(sql)
+    scores = result.fetchall()
+    return scores

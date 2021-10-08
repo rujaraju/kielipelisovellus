@@ -8,6 +8,7 @@ Tällä hetkellä mukana olevat ominaisuudet:
 - pelaaja voi pelata pelin ja kerää sillä pisteitä
 - pelaaja näkee pelin yhteydessä mainoksia eri kursseista
 - pelaaja voi klikata kursseja ja näkee silloin lisää kurssin tietoja sekä järjestäjän tietoja
+- pelaaja voi nähdä scoreboardin eli verrata omat pistemäärät muiden pelaajien pistemääriin
 - pelisuunnittelija voi lisätä kielen
 - pelisuunnittelija voi lisätä uuden pelin
 - pelisuunnittelija näkee listan omista peleistään (siinä näkee mm. montako kertaa on pelattu)
@@ -24,5 +25,6 @@ Pelisuunnittelija: käyttäjätunnus "Moby", salasana "porcelain".
 Koulutustarjoaja: käyttäjätunnus "petrikoivu", salasana "mahla".
 
 Sunniteltuja ominaisuuksia:
-- pelaaja voi nähdä scoreboardin eli verrata omat pistemäärät muiden pelaajien pistemääriin
+- koulutustarjoaja pitäisi pystyä piilottamaan kursseja
 - pääkäyttäjä voi poistaa pelaajia, pelisuunnittelijoita, pelejä, koulutustarjoajia ja niiden kouluja ja kursseja
+- salasanoja pitäisi tallentaa kryptattuina

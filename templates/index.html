@@ -4,7 +4,13 @@
 {% if session.user_id %}
 
 <h2>Hei, {{ session.firstname }}</h2>
-<p>Pisteitä: {{session.points}}</p>
+<p>Sinun pisteet: {{session.points}}</p>
+{% if langs %}
+<a class="btn btn-success" href="/tulostaulu">Näytä tulostaulu</a>
+{% else %}
+<a class="btn btn-success" href="/">Päävalikkoon</a>
+{% endif %}
+
 {% else %}
 <h2>Kirjaudu</h2>
 <a class="btn btn-warning" href="/luotunnukset" role="button">Rekisteröidy</a>
@@ -17,16 +23,16 @@
 {% for lang in langs %}
 <a style="width: 300px; margin-bottom: 5px;"class="btn btn-primary" href="/kieli/{{ lang.langname.lower() }}" role="button" style="margin-bottom: 5px;">{{ lang.langname}}</a><br>
 {% endfor %}
-
+{% if scores %}
 <table class="table">
     <tr>
-        <th>Nimi</th>
+        <th>Tunnus</th>
         <th>Pisteet</th>
     </tr>
 {% for score in scores %}
 <tr>
     <td>
-        {{ score.firstname }} {{ score.lastname }}
+        {{ score.username }} 
     </td>
     <td>
         {{ score.points }}
@@ -34,6 +40,7 @@
 </tr>
 {% endfor %}
 </table>
+{% endif %}
 
 
 {% else %}

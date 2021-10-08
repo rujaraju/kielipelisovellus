@@ -3,7 +3,7 @@ from flask import session, flash
 from os import abort
 
 def get():
-    sql = "SELECT * from courses WHERE school_id=:school_id AND visible=True"
+    sql = "SELECT * from courses WHERE school_id=:school_id"
     result = db.session.execute(sql, {"school_id": session["school"]})
     courses = result.fetchall()
     return courses
@@ -43,13 +43,13 @@ def edit(form):
     return
 
 def check(id):
-    sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id AND visible=True" #gotta check you're only trying to edit your own school
+    sql = "SELECT * from courses WHERE id=:id AND school_id=:school_id" #gotta check you're only trying to edit your own school
     result = db.session.execute(sql, {"id": id, "school_id": session["school"]})
     course = result.fetchone()
     return course
 
 def getRelevant(game_id):
-    sql = "select courses.id AS id, courses.coursename AS coursename, courses.info AS info from courses LEFT JOIN coursegames ON courses.id=coursegames.course_id LEFT JOIN games ON coursegames.game_id=games.id WHERE games.id=:game_id ORDER BY RANDOM () LIMIT 4"
+    sql = "select courses.id AS id, courses.coursename AS coursename, courses.info AS info from courses LEFT JOIN coursegames ON courses.id=coursegames.course_id LEFT JOIN games ON coursegames.game_id=games.id WHERE games.id=:game_id AND courses.visible=True ORDER BY RANDOM () LIMIT 4"
     result = db.session.execute(sql, {"game_id": game_id})
     courses = result.fetchall()
     return courses
