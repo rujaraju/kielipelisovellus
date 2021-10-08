@@ -1,8 +1,13 @@
 from db import db
 from flask import session, flash
+from os import abort
 import secrets
 
-def login(username, passwToCheck):
+def login(form):
+    username = form["username"]
+    passwToCheck = form["passw"]
+    if len(username) < 0 and len(passwToCheck) < 0:
+        return False
     sql = "SELECT passw, authority, firstname, id FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username": username})
     result = result.fetchone()

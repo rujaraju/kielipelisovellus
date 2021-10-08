@@ -1,5 +1,6 @@
 from db import db
-from flask import session
+from flask import session, flash
+from os import abort
 
 def get():
     sql = "SELECT * FROM games WHERE creator_id=:user_id ORDER BY visible"
@@ -58,4 +59,62 @@ def checkResult(answers):
         db.session.commit()
         del session["game_id"]
         return (True, points)
+
+def create(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    gamename = form["gamename"]
+    lang_id = form["lang_id"]
+    sentences = form.getlist("sentence")
+    rightanswers = form.getlist("rightanswer")
+    if len(gamename) < 3:
+        flash("Kielen nimi on lian lyhyt", "error")
+        return False
+    if not lang_id:
+        flash("Valitse kieli", "error")
+        return False
+    for i in range(len(sentences)):
+        if (len(sentences[i])) == 0:
+            if i < 3:
+                flash("Kirjoita ainakin kolme lausetta, kiitos", "error")
+                return False
+    sql = "SELECT * FROM games WHERE gamename=:gamename"
+    result = db.session.execute(sql, {"gamename":gamename})
+    if result.fetchone():
+        flash("Kielen nimi on jo käytössä", "error")
+        return False
+    sql = "INSERT INTO games (gamename, lang_id, creator_id) VALUES (:gamename, :lang_id, :user_id) RETURNING id"
+    result = db.session.execute(sql, {"gamename":gamename, "lang_id":lang_id, "user_id": session["user_id"]})
+    games_id = result.fetchone()[0]
+    for i in range(len(sentences)):
+        if (len(sentences[i])) == 0:
+            break
+        sql = "INSERT INTO sentences (games_id, info, rightanswer) VALUES (:games_id, :info, :rightanswer)"
+        db.session.execute(sql, {"games_id": games_id, "info": sentences[i], "rightanswer": rightanswers[i]})
+    db.session.commit()
+    return True
+
+def getchosen():
+    sql = "SELECT games.id, games.gamename FROM coursegames LEFT JOIN games ON coursegames.game_id=games.id WHERE coursegames.course_id=:course_id"
+    result = db.session.execute(sql, {"course_id": session["course"]})
+    chosen = result.fetchall()
+    print("chosen")
+    print(chosen)
+    return chosen
+
+def choose(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    game_id = form["game_id"]
+    sql = "INSERT INTO coursegames (game_id, course_id) VALUES (:game_id, :course_id)"
+    db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
+    db.session.commit()
+
+def unchoose(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    game_id = form["game_id"]
+    sql = "DELETE FROM coursegames WHERE game_id=:game_id AND course_id=:course_id"
+    db.session.execute(sql, {"game_id": game_id, "course_id": session["course"]})
+    db.session.commit()
     

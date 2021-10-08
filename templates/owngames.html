@@ -22,7 +22,16 @@
         Ei
         {% endif %}
     </td>
-    <td><a class="btn btn-warning" href={{'/deaktivoi/' +  game.id|string }} role="button">Valitse</a></td>
+    <td>      
+    <form action="/delgame" method="POST">
+        <input
+          type="hidden"
+          name="csrf_token"
+          value="{{ session.csrf_token }}"
+        />
+        <input type="hidden" name="game_id" value="{{ game.id }}" />
+        <input class="btn btn-danger" style="width: 100px;" type="submit" value="Poista" />
+      </form>
 </tr>
 {% endfor %}
 </table>

@@ -31,11 +31,11 @@
   {% for game in games %}
   <tr>
     <td style="width: 300px">
-      {{game.gamename}} {% if (game.id,) not in chosen %}{% else %}
+      {{game.gamename}} {% if (game.id,game.gamename) not in chosen %}{% else %}
       <i>(valittu)</i>{% endif %}
     </td>
     <td>
-      {% if (game.id,) not in chosen %}
+      {% if (game.id,game.gamename) not in chosen %}
       <form action="/choosegame" method="POST">
         <input
           type="hidden"
@@ -63,7 +63,7 @@
 </table>
 
 {% else %}
-<form class="editcourse" action="/createcourse" method="POST">
+<form class="editcourse" action="/editcourse" method="POST">
   <h4>Kurssin nimi:</h4>
   <textarea name="coursename" style="width: 500px; height: 40px">
 {{ course.coursename }}
