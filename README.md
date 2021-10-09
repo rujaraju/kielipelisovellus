@@ -28,6 +28,3 @@ Koulutustarjoaja: käyttäjätunnus "petrikoivu", salasana "mahla".
 Admin-oikeudet: käyttäjätunnus "admin", salasana "aivanmahdotonarvata1616"
 
 Jos rekisteröidyt, niin pääset käyttämään perusominaisuuksia, admin täytyy hyväksyä kaikkia peli- tai koulutussuunnittelijaoikeuksia.
-
-Vielä toteutumatta:
-- salasanoja pitäisi tallentaa kryptattuina

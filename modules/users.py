@@ -2,6 +2,7 @@ from modules.db import db
 from flask import session, flash
 from os import abort
 import secrets
+from werkzeug.security import check_password_hash, generate_password_hash
 
 def getAll():
     sql = "select * from users WHERE username NOT IN ('admin') ORDER BY active DESC, username"
@@ -25,7 +26,7 @@ def login(form):
     result = db.session.execute(sql, {"username": username})
     result = result.fetchone()
     if (result):
-        if (result[0] == passwToCheck):
+        if (check_password_hash(result[0], passwToCheck)):
             if not result[4]:
                 flash("Tunnuksesi on lukittu", "error")
                 return False
@@ -83,7 +84,7 @@ def addNew(form):
         flash("Käyttäjänimi on jo käytössä", "error")
         return False
     sql = "INSERT INTO users (username, firstname, lastname, passw, authority) VALUES (:username, :firstname, :lastname, :passw, :authority) RETURNING id"
-    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": 0})
+    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": generate_password_hash(passw), "authority": 0})
     user_id = result.fetchone()[0]
     if authority > 0:#wants to become more than regular user
         sql = "INSERT INTO awaitingapproval (user_id, wantsauthority) VALUES (:user_id, :authority)"
