@@ -25,7 +25,7 @@
         <li class="nav-item">
           <a class="nav-link" href="/">Alkuun</a>
         </li>
-        {% if session.authority > 0%}
+        {% if session.authority == 1 or session.authority == 2%}
         <li class="nav-item">
           <a class="nav-link" href="/luopeli">Luo peli</a>
         </li>
