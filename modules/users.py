@@ -3,6 +3,19 @@ from flask import session, flash
 from os import abort
 import secrets
 
+def getAll():
+    sql = "select * from users"
+    result = db.session.execute(sql)
+    users = result.fetchall()
+    return users
+
+def getWaiting():
+    sql = "select * from awaitingapproval LEFT JOIN users on users.id=awaitingapproval.user_id"
+    result = db.session.execute(sql)
+    awaiting = result.fetchall()
+    return awaiting
+
+
 def login(form):
     username = form["username"]
     passwToCheck = form["passw"]
@@ -66,7 +79,11 @@ def addNew(form):
         flash("Käyttäjänimi on jo käytössä", "error")
         return False
     sql = "INSERT INTO users (username, firstname, lastname, passw, authority) VALUES (:username, :firstname, :lastname, :passw, :authority) RETURNING id"
-    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": authority})
+    result = db.session.execute(sql, {"username":username, "firstname":firstname, "lastname":lastname, "passw": passw, "authority": 0})
     user_id = result.fetchone()[0]
+    if authority > 0:#wants to become more than regular user
+        sql = "INSERT INTO awaitingapproval (user_id, wantsauthority) VALUES (:user_id, :authority)"
+        db.session.execute(sql, {"user_id": user_id, "authority": authority})
+        flash("Ylläpitäjä tarkistaa tietosi, ja myöntää laajemmat oikeudet, nyt voit kirjautua tavallisena käyttäjänä", "message")
     db.session.commit()
     return True

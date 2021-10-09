@@ -42,6 +42,8 @@ def newschool():
 @app.route("/login",methods=["POST"]) # add message if wrong credentials
 def login():
     if (users.login(request.form)):
+        if users.credentials(10000, None):
+            return redirect("/admin")
         return redirect("/")
     flash("Tarkista kirjautumistiedot", "error")    
     return render_template("index.html")
@@ -178,6 +180,16 @@ def showgame():
     gamez.show(request.form)
     return redirect("/omatpelit")
 
+@app.route("/hidecourse", methods=["POST"])
+def hidecourse():
+    coursez.hide(request.form)
+    return redirect("/kurssihallinta/" + str(request.form["course_id"]))
+
+@app.route("/showcourse", methods=["POST"])
+def showcourse():
+    coursez.show(request.form)
+    return redirect("/kurssihallinta/" + str(request.form["course_id"]))
+
 @app.route("/kurssivalinta")
 def choosecourse():
     if not users.credentials(2, None):
@@ -217,3 +229,14 @@ def managecoursegames(id, langname):
         if course:
             return render_template("editcourse.html", langs=languages.get(), gameview=True, course=course, games=gamez.getByLang(lang_id), chosen=gamez.getchosen())
     return redirect("/kurssivalinta")#someone tried something funny, didn't work out
+
+@app.route("/admin")
+def admin():
+    if not users.credentials(10000, None):
+        return redirect("/")
+    langs = languages.get()
+    games = gamez.getAll()
+    courses = coursez.getAll()
+    userlist = users.getAll()
+    awaiting = users.getWaiting()
+    return render_template("admin.html", langs=langs, games=games, courses=courses, users=userlist, awaiting=awaiting)

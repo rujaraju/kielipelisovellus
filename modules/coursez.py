@@ -2,6 +2,12 @@ from modules.db import db
 from flask import session, flash
 from os import abort
 
+def getAll():
+    sql = "SELECT * from courses;"
+    result = db.session.execute(sql)
+    courses = result.fetchall()
+    return courses
+
 def get():
     sql = "SELECT * from courses WHERE school_id=:school_id"
     result = db.session.execute(sql, {"school_id": session["school"]})
@@ -53,3 +59,19 @@ def getRelevant(game_id):
     result = db.session.execute(sql, {"game_id": game_id})
     courses = result.fetchall()
     return courses
+
+def hide(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    course_id = form["course_id"]
+    sql = "UPDATE courses SET visible=false WHERE id=:course_id"
+    db.session.execute(sql, {"course_id": course_id})
+    db.session.commit()
+
+def show(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    course_id = form["course_id"]
+    sql = "UPDATE courses SET visible=True WHERE id=:course_id"
+    db.session.execute(sql, {"course_id": course_id})
+    db.session.commit()

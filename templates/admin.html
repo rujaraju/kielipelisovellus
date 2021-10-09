@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+
+{% block header %}
+
+<h2>Hei, {{ session.firstname }}</h2>
+
+{% endblock %}
+
+
+{% block content %}
+
+{% if awaiting %}
+<h4 id="accept">Odottaa hyväksyntää:</h4>
+<table class="table">
+    <tr>
+        <th>Tunnus</th>
+        <th>Etunimi</th>
+        <th>Sukunimi</th>
+        <th>Oikeudet</th>
+        <th></th>
+        <th></th>
+    </tr>
+{% for user in awaiting %}
+<tr>
+    <td>
+        {{ user.username }} 
+    </td>
+    <td>
+        {{ user.firstname }}
+    </td>
+    <td>
+        {{ user.lastname }}
+    </td>
+    <td>{{user.wantsauthority }}
+    </td>
+    <td>
+        <form style="margin-top: 5px" class="block" action="/approve" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="user_id" value="{{ user.id }}" />
+            <input type="submit" class="btn btn-success" value="Hyväksy" />
+          </form>
+    </td>
+    <td>
+        <form style="margin-top: 5px" class="block" action="/disapprove" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="user_id" value="{{ user.id }}" />
+            <input type="submit" class="btn btn-danger" value="Hylkää" />
+          </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+{% endif %}
+{% if users %}
+<h4 id="users">Käyttäjät:</h4>
+<table class="table">
+    <tr>
+        <th>Tunnus</th>
+        <th>Etunimi</th>
+        <th>Sukunimi</th>
+        <th>Käytössä</th>
+        <th>Muokkaa</th>
+    </tr>
+{% for user in users %}
+<tr>
+    <td>
+        {{ user.username }} 
+    </td>
+    <td>
+        {{ user.firstname }}
+    </td>
+    <td>
+        {{ user.lastname }}
+    </td>
+    <td>{% if user.active %}
+        Kyllä
+        {% else %}
+        Ei
+        {% endif %}
+    </td>
+    <td>
+        {% if user.active %}
+        <form style="margin-top: 5px" class="block" action="/block" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="user_id" value="{{ user.id }}" />
+            <input type="submit" class="btn btn-danger" value="Blokkaa" />
+          </form>
+        {% else %}
+        <form style="margin-top: 5px" class="block" action="/unblock" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="user_id" value="{{ user.id }}" />
+            <input type="submit" class="btn btn-success" value="Aktivoi" />
+          </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+
+{% endblock %}

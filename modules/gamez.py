@@ -2,6 +2,12 @@ from modules.db import db
 from flask import session, flash
 from os import abort
 
+def getAll():#used by admin
+    sql = "SELECT * FROM games;"
+    result = db.session.execute(sql)
+    games = result.fetchall()
+    return games
+
 def get():
     sql = "SELECT * FROM games WHERE creator_id=:user_id ORDER BY visible"
     result = db.session.execute(sql, {"user_id": session["user_id"]})

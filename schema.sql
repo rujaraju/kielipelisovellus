@@ -64,3 +64,9 @@ CREATE TABLE coursegames (
     game_id INTEGER REFERENCES games,
     course_id INTEGER REFERENCES courses
 );
+
+CREATE TABLE awaitingapproval (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users,
+    wantsauthority INTEGER
+)

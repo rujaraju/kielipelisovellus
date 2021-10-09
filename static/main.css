@@ -57,3 +57,7 @@ form .btn {
   display: block;
   background-color: white;
 }
+
+.block input[type="submit"]{
+    width: 80px;
+}
