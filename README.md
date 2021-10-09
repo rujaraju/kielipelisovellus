@@ -1,8 +1,8 @@
 # kielipelisovellus
 
-Sovelluksessa voi valita eri kielten kielipelejä (pelejä tulevat olemaan hyvin yksinkertaisia). Sovelluksesta saa myös vinkkejä, missä kouluissa/opistoissa ja millä kursseilla kyseistä kieltä voi opiskella. 
+Sovelluksessa voi valita eri kielten kielipelejä (pelit tulevat olemaan hyvin yksinkertaisia). Sovelluksesta saa myös vinkkejä, missä kouluissa/opistoissa ja millä kursseilla kyseistä kieltä voi opiskella. 
 
-Tällä hetkellä mukana olevat ominaisuudet:
+Sovelluksen ominaisuudet:
 - käyttäjä voi kirjautua sisään ja ulos sekä luoda uuden tunnuksen
 - pelaaja voi valita kieltä millä haluaa pelata, ja sen jälkeen kyseisen kielen pelejä
 - pelaaja voi pelata pelin ja kerää sillä pisteitä
