@@ -17,6 +17,7 @@ Tällä hetkellä mukana olevat ominaisuudet:
 - koulutustarjoaja voi lisätä uusia kursseja ja lisätä pelejä jotka hänen mielestä sopii yhteen tämän kurssin kanssa
 - koulutustarjoaja voi muokata omia kurssejaan
 - pääkäyttäjä voi hyväksyä hakemuksia saada peli- tai koulutussuunnittelijaoikeudet
+- pääkäyttäjä voi blokata käyttäjiä ja piilota pelejä tai kursseja
 
 [Löytyy täältä](https://ruja-kieli.herokuapp.com/)
 
@@ -24,9 +25,9 @@ Voit käyttää esim. koehenkilöitä:
 Peruskäyttäjä: käyttäjätunnus "barabbas", salasana "barbiedoll".
 Pelisuunnittelija: käyttäjätunnus "Moby", salasana "porcelain".
 Koulutustarjoaja: käyttäjätunnus "petrikoivu", salasana "mahla".
+Admin-oikeudet: käyttäjätunnus "admin", salasana "aivanmahdotonarvata1616"
 
 Jos rekisteröidyt, niin pääset käyttämään perusominaisuuksia, admin täytyy hyväksyä kaikkia peli- tai koulutussuunnittelijaoikeuksia.
 
-Sunniteltuja ominaisuuksia:
-- pääkäyttäjä voi blokata käyttäjiä ja poistaa pelejä ja kursseja
+Vielä toteutumatta:
 - salasanoja pitäisi tallentaa kryptattuina

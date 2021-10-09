@@ -107,3 +107,22 @@ def unblock(form):
     sql = "UPDATE users SET active=True WHERE id=:user_id"
     db.session.execute(sql, {"user_id": user_id})
     db.session.commit()
+
+def approve(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    user_id = form["user_id"]
+    authority = form["authority"]
+    sql = "UPDATE users SET authority=:authority WHERE id=:user_id"
+    db.session.execute(sql, {"authority": authority, "user_id": user_id})
+    sql = "DELETE FROM awaitingapproval WHERE user_id=:user_id"
+    db.session.execute(sql, {"user_id": user_id})
+    db.session.commit()
+
+def disapprove(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    user_id = form["user_id"]
+    sql = "DELETE FROM awaitingapproval WHERE user_id=:user_id"
+    db.session.execute(sql, {"user_id": user_id})
+    db.session.commit()

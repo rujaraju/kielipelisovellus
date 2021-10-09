@@ -257,3 +257,13 @@ def block():
 def unblock():
     users.unblock(request.form)
     return redirect("/admin")
+
+@app.route("/approve", methods=["POST"])
+def approve():
+    users.approve(request.form)
+    return redirect("/admin")
+
+@app.route("/disapprove", methods=["POST"])
+def disapprove():
+    users.disapprove(request.form)
+    return redirect("/admin")
