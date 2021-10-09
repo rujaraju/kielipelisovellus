@@ -4,7 +4,8 @@ CREATE TABLE users (
     firstname TEXT,
     lastname TEXT,
     passw TEXT,
-    authority INTEGER
+    authority INTEGER,
+    active BOOLEAN DEFAULT true
 );
 
 CREATE TABLE langs (

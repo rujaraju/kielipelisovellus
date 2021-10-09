@@ -3,7 +3,9 @@
 {% block header %}
 
 <h2>Hei, {{ session.firstname }}</h2>
-
+<a class="btn btn-primary marg" href="/admin#users">Käyttäjät</a><br>
+<a class="btn btn-primary marg" href="/admin#games">Pelit</a><br>
+<a class="btn btn-primary marg" href="/admin#courses">Kurssit</a><br>
 {% endblock %}
 
 
@@ -99,5 +101,94 @@
 </table>
 {% endif %}
 
+{% if games %}
+<h4 id="games">Pelit:</h4>
+<table class="table">
+    <tr>
+        <th>Nimi</th>
+        <th>Pelikertoja</th>
+        <th>Luoja</th>
+        <th>Aktiivinen</th>
+        <th>Muokkaa</th>
+    </tr>
+{% for game in games %}
+<tr>
+    <td>
+        {{ game.gamename }} 
+    </td>
+    <td>
+        {{ game.playcount }}
+    </td>
+    <td>
+        {{ game.username }}
+    </td>
+    <td>{% if game.visible %}
+        Kyllä
+        {% else %}
+        Ei
+        {% endif %}
+    </td>
+    <td>
+        {% if game.visible %}
+        <form style="margin-top: 5px" class="block" action="/hidegame" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="game_id" value="{{ game.id }}" />
+            <input type="submit" class="btn btn-danger" value="Piilota" />
+          </form>
+        {% else %}
+        <form style="margin-top: 5px" class="block" action="/showgame" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="game_id" value="{{ game.id }}" />
+            <input type="submit" class="btn btn-success" value="Aktivoi" />
+          </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% if courses %}
+<h4 id="courses">Kurssit:</h4>
+<table class="table">
+    <tr>
+        <th>Nimi</th>
+        <th>Koulu</th>
+        <th>Aktiivinen</th>
+        <th>Muokkaa</th>
+    </tr>
+{% for course in courses %}
+<tr>
+    <td>
+        {{ course.coursename }} 
+    </td>
+    <td>
+        {{ course.schoolname }}
+    </td>
+    <td>{% if course.visible %}
+        Kyllä
+        {% else %}
+        Ei
+        {% endif %}
+    </td>
+    <td>
+        {% if course.visible %}
+        <form style="margin-top: 5px" class="block" action="/hidecourse" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="course_id" value="{{ course.id }}" />
+            <input type="submit" class="btn btn-danger" value="Piilota" />
+          </form>
+        {% else %}
+        <form style="margin-top: 5px" class="block" action="/showcourse" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="course_id" value="{{ course.id }}" />
+            <input type="submit" class="btn btn-success" value="Aktivoi" />
+          </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
 
 {% endblock %}

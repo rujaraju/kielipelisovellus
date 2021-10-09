@@ -3,13 +3,13 @@ from flask import session, flash
 from os import abort
 
 def getAll():
-    sql = "SELECT * from courses;"
+    sql = "SELECT courses.coursename AS coursename, courses.id AS id, courses.visible AS visible, schools.schoolname from courses join schools on courses.school_id=schools.id ORDER BY visible desc, coursename;"
     result = db.session.execute(sql)
     courses = result.fetchall()
     return courses
 
 def get():
-    sql = "SELECT * from courses WHERE school_id=:school_id"
+    sql = "SELECT * from courses WHERE school_id=:school_id ORDER BY visible DESC, coursename"
     result = db.session.execute(sql, {"school_id": session["school"]})
     courses = result.fetchall()
     return courses

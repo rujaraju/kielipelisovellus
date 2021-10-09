@@ -3,19 +3,19 @@ from flask import session, flash
 from os import abort
 
 def getAll():#used by admin
-    sql = "SELECT * FROM games;"
+    sql = "SELECT games.id AS id, games.gamename AS gamename, games.playcount AS playcount, games.visible AS visible, users.username AS username FROM games Left Join users ON games.creator_id=users.id ORDER BY visible DESC, gamename;"
     result = db.session.execute(sql)
     games = result.fetchall()
     return games
 
 def get():
-    sql = "SELECT * FROM games WHERE creator_id=:user_id ORDER BY visible"
+    sql = "SELECT * FROM games WHERE creator_id=:user_id ORDER BY visible DESC, gamename"
     result = db.session.execute(sql, {"user_id": session["user_id"]})
     games = result.fetchall()
     return games
 
 def getByLang(lang_id):
-        sql = "SELECT id, gamename FROM games where lang_id=:lang_id AND visible=True"
+        sql = "SELECT id, gamename FROM games where lang_id=:lang_id AND visible=True ORDER BY gamename"
         result = db.session.execute(sql, {"lang_id":lang_id})
         games = result.fetchall()
         return games
@@ -143,7 +143,7 @@ def show(form):
     db.session.commit()
 
 def scores():
-    sql = "SELECT users.username AS username, SUM (points.points) AS points FROM points LEFT JOIN users ON users.id=points.user_id group by users.username ORDER BY sum(points.points) DESC LIMIT 20"
+    sql = "SELECT users.username AS username, users.active AS active, SUM (points.points) AS points FROM points LEFT JOIN users ON users.id=points.user_id WHERE active=True group by users.username, active ORDER BY sum(points.points) DESC LIMIT 20"
     result = db.session.execute(sql)
     scores = result.fetchall()
     return scores

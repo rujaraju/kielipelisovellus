@@ -44,8 +44,7 @@ def login():
     if (users.login(request.form)):
         if users.credentials(10000, None):
             return redirect("/admin")
-        return redirect("/")
-    flash("Tarkista kirjautumistiedot", "error")    
+        return redirect("/")    
     return render_template("index.html")
 
 @app.route("/logout")
@@ -173,21 +172,29 @@ def delcoursegame():
 @app.route("/hidegame", methods=["POST"])
 def hidegame():
     gamez.hide(request.form)
+    if session["authority"] == 10000:
+            return redirect("/admin")
     return redirect("/omatpelit")
 
 @app.route("/showgame", methods=["POST"])
 def showgame():
     gamez.show(request.form)
+    if session["authority"] == 10000:
+        return redirect("/admin")
     return redirect("/omatpelit")
 
 @app.route("/hidecourse", methods=["POST"])
 def hidecourse():
     coursez.hide(request.form)
+    if session["authority"] == 10000:
+        return redirect("/admin")
     return redirect("/kurssihallinta/" + str(request.form["course_id"]))
 
 @app.route("/showcourse", methods=["POST"])
 def showcourse():
     coursez.show(request.form)
+    if session["authority"] == 10000:
+        return redirect("/admin")
     return redirect("/kurssihallinta/" + str(request.form["course_id"]))
 
 @app.route("/kurssivalinta")
@@ -240,3 +247,13 @@ def admin():
     userlist = users.getAll()
     awaiting = users.getWaiting()
     return render_template("admin.html", langs=langs, games=games, courses=courses, users=userlist, awaiting=awaiting)
+
+@app.route("/block", methods=["POST"])
+def block():
+    users.block(request.form)
+    return redirect("/admin")
+
+@app.route("/unblock", methods=["POST"])
+def unblock():
+    users.unblock(request.form)
+    return redirect("/admin")

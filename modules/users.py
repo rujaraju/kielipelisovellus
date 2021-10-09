@@ -4,13 +4,13 @@ from os import abort
 import secrets
 
 def getAll():
-    sql = "select * from users"
+    sql = "select * from users WHERE username NOT IN ('admin') ORDER BY active DESC, username"
     result = db.session.execute(sql)
     users = result.fetchall()
     return users
 
 def getWaiting():
-    sql = "select * from awaitingapproval LEFT JOIN users on users.id=awaitingapproval.user_id"
+    sql = "select * from awaitingapproval LEFT JOIN users on users.id=awaitingapproval.user_id ORDER BY username"
     result = db.session.execute(sql)
     awaiting = result.fetchall()
     return awaiting
@@ -21,11 +21,14 @@ def login(form):
     passwToCheck = form["passw"]
     if len(username) < 0 and len(passwToCheck) < 0:
         return False
-    sql = "SELECT passw, authority, firstname, id FROM users WHERE username=:username"
+    sql = "SELECT passw, authority, firstname, id, active FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username": username})
     result = result.fetchone()
     if (result):
         if (result[0] == passwToCheck):
+            if not result[4]:
+                flash("Tunnuksesi on lukittu", "error")
+                return False
             session["csrf_token"] = secrets.token_hex(16)
             session["authority"] = result[1]
             session["firstname"] = result[2]
@@ -43,6 +46,7 @@ def login(form):
             if result:
                 session["school"] = result[0]
             return True
+        flash("Tarkista kirjautumistiedot", "error")
         return False
     return False
 
@@ -87,3 +91,19 @@ def addNew(form):
         flash("Ylläpitäjä tarkistaa tietosi, ja myöntää laajemmat oikeudet, nyt voit kirjautua tavallisena käyttäjänä", "message")
     db.session.commit()
     return True
+
+def block(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    user_id = form["user_id"]
+    sql = "UPDATE users SET active=false WHERE id=:user_id"
+    db.session.execute(sql, {"user_id": user_id})
+    db.session.commit()
+
+def unblock(form):
+    if session["csrf_token"] != form["csrf_token"]:
+        abort(403)
+    user_id = form["user_id"]
+    sql = "UPDATE users SET active=True WHERE id=:user_id"
+    db.session.execute(sql, {"user_id": user_id})
+    db.session.commit()
