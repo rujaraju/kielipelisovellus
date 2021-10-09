@@ -36,7 +36,7 @@ def newgame():
 def newschool():
     return render_template("newschool.html")
 
-@app.route("/login",methods=["POST"]) # add message if wrong credentials
+@app.route("/login",methods=["POST"])
 def login():
     if (users.login(request.form)):
         if users.credentials(10000, None):
@@ -104,16 +104,9 @@ def editschool():
     school = schoolz.get()
     return render_template("editschool.html", school=school)
 
-@app.route("/playgame", methods=["POST"]) # to add here: page to show result from current game
+@app.route("/playgame", methods=["POST"])
 def playgame():
     gamez.checkResult(request.form.getlist("answer"))
-    #if result[0]:
-    #    if result[1] == 0:
-    #        flash("Oho, nyt et saanut yhtään pistettä :(", "message")
-    #    else:
-    #        flash("Onnittelut, ansaitsit " + str(result[1]) + " pistettä!", "message")#move to gamezmodule?
-    #else:
-    #    flash("Sait " + str(result[1]) + " pistettä, mutta tämä ei ollut parempaa tulosta kuin viimeksi", "message")
     return redirect("/")
 
 @app.route("/createuser", methods=["POST"])
