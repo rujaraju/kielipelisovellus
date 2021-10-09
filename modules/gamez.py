@@ -56,17 +56,26 @@ def checkResult(answers):
             db.session.execute(sql, {"points": points, "game_id": session["game_id"], "user_id": session["user_id"]})
             session["points"] = session["points"] - session["current_points"] + points
             db.session.commit()
-            return (True, points)
+            if points == 0:
+                flash("Oho, nyt et saanut yhtään pistettä :(", "message")
+            else:
+                flash("Onnittelut, ansaitsit " + str(points) + " pistettä!", "message")#move to gamezmodule?
+            #return (True, points)
         del session["current_points"]
         del session["game_id"]
-        return (False, points)
+        flash("Sait " + str(points) + " pistettä, mutta tämä ei ollut parempaa tulosta kuin viimeksi", "message")
+        #return (False, points)
     else:
         sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
         db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
         session["points"] = session["points"] + points
         db.session.commit()
         del session["game_id"]
-        return (True, points)
+        if points == 0:
+            flash("Oho, nyt et saanut yhtään pistettä :(", "message")
+        else:
+            flash("Onnittelut, ansaitsit " + str(points) + " pistettä!", "message")#move to gamezmodule?
+        #return (True, points)
 
 def create(form):
     if session["csrf_token"] != form["csrf_token"]:

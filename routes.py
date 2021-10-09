@@ -109,11 +109,14 @@ def editschool():
 
 @app.route("/playgame", methods=["POST"]) # to add here: page to show result from current game
 def playgame():
-    result = gamez.checkResult(request.form.getlist("answer"))
-    if result[0]:
-        flash("Onnittelut, ansaitsit " + str(result[1]) + " pistettä!", "message")#move to gamezmodule?
-    else:
-        flash("Sait " + str(result[1]) + " pistettä, mutta tämä ei ollut parempaa tulosta kuin viimeksi", "message")
+    gamez.checkResult(request.form.getlist("answer"))
+    #if result[0]:
+    #    if result[1] == 0:
+    #        flash("Oho, nyt et saanut yhtään pistettä :(", "message")
+    #    else:
+    #        flash("Onnittelut, ansaitsit " + str(result[1]) + " pistettä!", "message")#move to gamezmodule?
+    #else:
+    #    flash("Sait " + str(result[1]) + " pistettä, mutta tämä ei ollut parempaa tulosta kuin viimeksi", "message")
     return redirect("/")
 
 @app.route("/createuser", methods=["POST"])
