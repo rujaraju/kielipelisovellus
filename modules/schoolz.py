@@ -19,8 +19,8 @@ def create(form):
     if len(schoolname) < 3 or len(info) < 10 or len(address) < 10 or len(phone) < 4 or len(www) < 3:
         flash("Tarkista, että kaikki kentät ovat oikein täytetty", "error")
         return False
-    sql = "INSERT INTO schools (schoolname, info, address, phone, www, visible) VALUES (:schoolname, :info, :address, :phone, :www, :visible) RETURNING id"
-    result = db.session.execute(sql, {"schoolname":schoolname, "info": info, "address": address, "phone": phone, "www": www, "visible": True})
+    sql = "INSERT INTO schools (schoolname, info, address, phone, www, visible) VALUES (:schoolname, :info, :address, :phone, :www, 'true') RETURNING id"
+    result = db.session.execute(sql, {"schoolname":schoolname, "info": info, "address": address, "phone": phone, "www": www})
     school_id = result.fetchone()[0]
     sql = "INSERT INTO schooladmins (user_id, school_id) VALUES (:user_id, :school_id)"
     db.session.execute(sql, {"user_id":session["user_id"], "school_id": school_id})

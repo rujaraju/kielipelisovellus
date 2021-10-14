@@ -46,9 +46,13 @@ def checkResult(answers):
     rightanswers = result.fetchall()
     i = 0
     points = 0
+    wrong = "";
     while i < len(rightanswers):
         if rightanswers[i][0] == answers[i]:
             points += 1
+        else:
+            if len(answers[i]) > 0:
+                wrong += "'" + answers[i] + "', "
         i += 1
     if session.get("current_points"): #user has played this game before
         if points > session["current_points"]: #only update if got more points this time around
@@ -58,13 +62,18 @@ def checkResult(answers):
             db.session.commit()
             if points == 0:
                 flash("Oho, nyt et saanut yhtään pistettä :(", "message")
+            elif len(wrong) > 0:
+                flash("Onnittelut, ansaitsit " + str(points) + " pistettä! Hutiin meni(vät): " + wrong + " tsemppiä!", "message")
             else:
-                flash("Onnittelut, ansaitsit " + str(points) + " pistettä!", "message")#move to gamezmodule?
-            #return (True, points)
+                flash("Onnittelut, ansaitsit " + str(points) + " pistettä, kaikki!", "message")
+            return
         del session["current_points"]
         del session["game_id"]
-        flash("Sait " + str(points) + " pistettä, mutta tämä ei ollut parempaa tulosta kuin viimeksi", "message")
-        #return (False, points)
+        if len(wrong) > 0:
+            flash("Et saanut parempia pisteitä kuin viimeksi! Hutiin meni(vät): " + wrong + " harmi!", "message")
+        else:
+            flash("Et saanut parempia pisteitä kuin viimeksi! Tällä kerralla: " + str(points) + " pistettä!", "message")
+        return
     else:
         sql = "INSERT INTO points (user_id, game_id, points) VALUES (:user_id, :game_id, :points)"
         db.session.execute(sql, {"user_id": session["user_id"], "game_id": session["game_id"], "points": points})
@@ -73,9 +82,11 @@ def checkResult(answers):
         del session["game_id"]
         if points == 0:
             flash("Oho, nyt et saanut yhtään pistettä :(", "message")
+        elif len(wrong) > 0:
+            flash("Onnittelut, ansaitsit " + str(points) + " pistettä! Hutiin menivät: " + wrong + " oho!", "message")
         else:
-            flash("Onnittelut, ansaitsit " + str(points) + " pistettä!", "message")#move to gamezmodule?
-        #return (True, points)
+            flash("Onnittelut, ansaitsit " + str(points) + " pistettä!", "message")
+        return
 
 def create(form):
     if session["csrf_token"] != form["csrf_token"]:

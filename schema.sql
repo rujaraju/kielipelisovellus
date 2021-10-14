@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE user (
     id SERIAL PRIMARY KEY,
     username TEXT,
     firstname TEXT,
@@ -8,35 +8,35 @@ CREATE TABLE users (
     active BOOLEAN DEFAULT true
 );
 
-CREATE TABLE langs (
+CREATE TABLE lang (
     id SERIAL PRIMARY KEY,
     langname TEXT
 );
 
-CREATE TABLE games (
+CREATE TABLE game (
     id SERIAL PRIMARY KEY,
     gamename TEXT, 
-    lang_id INTEGER REFERENCES langs,
-    creator_id INTEGER REFERENCES users,
+    lang_id INTEGER REFERENCES lang,
+    creator_id INTEGER REFERENCES user,
     playcount INTEGER DEFAULT 0,
     visible BOOLEAN DEFAULT True
 );
 
-CREATE TABLE sentences (
+CREATE TABLE sentence (
     id SERIAL PRIMARY KEY,
     info TEXT,
     rightanswer TEXT,
-    games_id INTEGER REFERENCES games
+    games_id INTEGER REFERENCES game
 );
 
 CREATE TABLE points (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users,
-    game_id INTEGER REFERENCES games,
+    user_id INTEGER REFERENCES user,
+    game_id INTEGER REFERENCES game,
     points INTEGER
 );
 
-CREATE TABLE schools (
+CREATE TABLE school (
     id SERIAL PRIMARY KEY,
     schoolname TEXT,
     info TEXT,
@@ -46,28 +46,28 @@ CREATE TABLE schools (
     visible BOOLEAN
 );
 
-CREATE TABLE schooladmins (
+CREATE TABLE schooladmin (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users,
-    school_id INTEGER REFERENCES schools
+    user_id INTEGER REFERENCES user,
+    school_id INTEGER REFERENCES school
 );
 
-CREATE TABLE courses (
+CREATE TABLE course (
     id SERIAL PRIMARY KEY,
     coursename TEXT,
     info TEXT,
-    school_id INTEGER REFERENCES schools,
+    school_id INTEGER REFERENCES school,
     visible BOOLEAN DEFAULT true
 );
 
-CREATE TABLE coursegames (
+CREATE TABLE coursegame (
     id SERIAL PRIMARY KEY,
-    game_id INTEGER REFERENCES games,
-    course_id INTEGER REFERENCES courses
+    game_id INTEGER REFERENCES game,
+    course_id INTEGER REFERENCES course
 );
 
 CREATE TABLE awaitingapproval (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES users,
+    user_id INTEGER REFERENCES user,
     wantsauthority INTEGER
 )
